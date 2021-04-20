@@ -1,0 +1,56 @@
+.ngx-mat-ext-select-field {
+  min-width: 75px;
+}
+
+/* extends mat-select-panel -alos include class="mat-select-panel and make sure these attributes override*/
+.ngx-mat-ext-select-panel {
+  padding: 3px !important;
+  overflow:hidden !important;
+}
+
+.ngx-mat-ext-select-list {
+  padding-top: 0px;
+}
+
+.ngx-mat-ext-select-search-found {
+  border-left: 2px solid red;
+  max-width: calc(100% - 2px);
+}
+
+.ngx-mat-ext-select-search-notfound {
+  border-left: 2px solid transparent;
+  max-width: calc(100% - 2px);
+}
+
+/* supress horz scroll on cdk-virtual-scroll-viewport*/
+.ngx-mat-ext-select-nohorzscroll .cdk-virtual-scroll-content-wrapper {
+  max-width: 100%;
+}
+
+/* small form field - currently for components placed on button ribbon */
+.ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-flex {
+  align-items: center;
+  padding-right: 0.1em;
+}
+.ngx-mat-ext-select-small-input.mat-form-field:not([appearance="outline"]) .mat-form-field-flex {
+  padding-top: 0em;
+}
+.ngx-mat-ext-select-small-input.mat-form-field:not([appearance="outline"]) .mat-form-field-wrapper .mat-form-field-underline {
+  bottom: 0em;
+}
+.ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-infix {
+  padding: 0.6em 0 0.75em 0;
+  font-size: 9pt;
+}
+.ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-infix .mat-select-arrow {
+  margin-top: 6px;
+}
+.ngx-mat-ext-select-small-input.mat-form-field:not(.mat-form-field-should-float) .mat-form-field-label.mat-form-field-empty {
+  top: 1.5em;
+}
+.ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-wrapper {
+  padding-bottom: 0em;
+}
+.ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-suffix {
+  top: 0.12em;
+}

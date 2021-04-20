@@ -1,0 +1,67 @@
+<form [formGroup]="selectForm" autocomplete="off" fxLayout="row" fxLayoutAlign="center center"
+  *ngIf="{icon: currentIcon | async} as component">
+  <!--field to display selection, which also is trigger for drop down-list-->
+  <mat-form-field #textfield [ngClass]="{'ngx-mat-ext-select-field':true, 'ngx-mat-ext-select-small-input': selectFieldSize==='small'}"
+    [appearance]="selectFieldAppearance" [style.width.px]="selectFieldWidth" [mdePopoverTriggerFor]="selectPopover"
+    mdePopoverTriggerOn="click" popoverTrigger="mdePopoverTrigger" [mdePopoverCloseOnClick]="false" (opened)="opened()"
+    (closed)="closed()">
+    <mat-label>{{selectPlaceholder}}</mat-label>
+    <input #input matInput type="text" formControlName="selectField" [placeholder]="'selectPlaceholder'"
+      readonly>
+
+    <!--drop down arrow simulating a select component-->
+    <mat-icon matSuffix svgIcon="ngx-mat-ext-select-ddarrow"></mat-icon>
+
+    <!--if icon to be displayed in field-->
+    <mat-icon matPrefix *ngIf="selectDisplayIconInField && component.icon?.type === 'svg' && component.icon?.id"
+      [svgIcon]="component.icon?.id || ''" [style.min-width.px]="35"></mat-icon>
+    <mat-icon matPrefix *ngIf="selectDisplayIconInField && component.icon?.type === 'basic' && component.icon?.id"
+      [style.min-width.px]="35">{{component.icon?.id || ''}}</mat-icon>
+  </mat-form-field>
+
+  <!--popover for drop down list-->
+  <mde-popover #selectPopover="mdePopover" [mdePopoverOverlapTrigger]="true" mdePopoverPositionY="below"
+    mdePopoverPositionX="before" [mdePopoverOffsetY]="selectFieldSize === 'small' ? 15: 20" [mdePopoverOffsetX]="0">
+    <div class="mat-select-panel ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="5px" fxLayoutAlign="start center"
+      [style.min-width.px]="selectDDWidth" [style.min-height.px]="dropDownHeight">
+
+      <!--search box-->
+      <ngx-mat-searchbox #search *ngIf="selectSearch" [searchData]="(searchData$ | async) || []"
+        [searchExcludeChars]="searchExcludeChars" [searchComponentWidth]="selectDDWidth - 40"
+        [searchExtended]="searchExtended" [searchExtendedPopupDelay]="searchExtendedPopupDelay"
+        [searchTerms]="searchTerms" [searchNextRow]="searchNextRow" [searchContinuous]="searchContinuous"
+        [searchDebounceMS]="searchDebounceMS" [searchCaseSensitive]="searchCaseSensitive"
+        [searchStartsWith]="searchStartsWith" [searchMultiple]="searchMultiple" (searchResults)="searched($event)">
+      </ngx-mat-searchbox>
+
+      <!--list-->
+      <mat-selection-list #list class="ngx-mat-ext-select-list" formControlName="selectList" [multiple]="false">
+
+        <!--scroller for list - needed for scrollTo on search functionality + dealing with large lists-->
+        <cdk-virtual-scroll-viewport *ngIf="firstOpen | async" #viewport itemSize="selectItemHeight"
+          class="ngx-mat-ext-select-nohorzscroll" [style.width.px]="selectDDWidth"
+          [style.height.px]="dropDownHeight - (selectSearch ? 52 : 0)">
+
+          <!--each row represents a item-->
+          <mat-list-option
+            *cdkVirtualFor="let item of selectItems$; trackBy:listTrackBy; let row = index; templateCacheSize: 0"
+            [value]=item.value [ngClass]="(searchRowFound(row) | async) ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
+            [style.height.px]="selectItemHeight">
+
+            <!--icon if specified-->
+            <mat-icon *ngIf="item.icon && item.icon.type === 'svg'" matListIcon aria-hidden="true"
+              [svgIcon]="item.icon.id"></mat-icon>
+            <mat-icon *ngIf="item.icon && item.icon.type === 'basic'" aria-hidden="true" matListIcon>{{item.icon.id}}
+            </mat-icon>
+
+            <!--item representation multi-line labels-->
+            <div matLine *ngFor="let label of item.labels; let lrow = index"
+              [style]="getLineStyle(lrow, label.style, label.fontSizePt)">{{label.text}}</div>
+
+            <mat-divider *ngIf="item.labels.length > 1"></mat-divider>
+          </mat-list-option>
+        </cdk-virtual-scroll-viewport>
+      </mat-selection-list>
+    </div>
+  </mde-popover>
+</form>

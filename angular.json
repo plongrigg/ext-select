@@ -1,7 +1,51 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "cli": {
+    "analytics": "94fdfe61-4127-4165-8214-2ccb3ccd007c"
+  },
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-  }
+    "ngx-mat-ext-select": {
+      "projectType": "library",
+      "root": "projects/ngx-mat-ext-select",
+      "sourceRoot": "projects/ngx-mat-ext-select/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "projects/ngx-mat-ext-select/tsconfig.lib.json",
+            "project": "projects/ngx-mat-ext-select/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-mat-ext-select/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngx-mat-ext-select/src/test.ts",
+            "tsConfig": "projects/ngx-mat-ext-select/tsconfig.spec.json",
+            "karmaConfig": "projects/ngx-mat-ext-select/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/ngx-mat-ext-select/tsconfig.lib.json",
+              "projects/ngx-mat-ext-select/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "ngx-mat-ext-select"
 }

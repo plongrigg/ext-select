@@ -390,7 +390,6 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     const icon = Array.from(this.selectItems?.values() || []).find(selectItem => selectItem.value === value)?.icon || placeholder;
     const currentIcon = this.currentIcon.getValue();
     if (currentIcon.type === icon.type && currentIcon.id === icon.id) { return; }
-
     this.currentIcon.next(icon);
   }
 

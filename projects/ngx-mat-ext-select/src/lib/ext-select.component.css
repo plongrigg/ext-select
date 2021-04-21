@@ -4,7 +4,7 @@
 
 /* extends mat-select-panel -alos include class="mat-select-panel and make sure these attributes override*/
 .ngx-mat-ext-select-panel {
-  padding: 3px !important;
+  padding: 0px !important;
   overflow:hidden !important;
 }
 

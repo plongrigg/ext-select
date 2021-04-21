@@ -3,8 +3,7 @@
   <!--field to display selection, which also is trigger for drop down-list-->
   <mat-form-field #textfield
     [ngClass]="{'ngx-mat-ext-select-field':true, 'ngx-mat-ext-select-small-input': selectFieldSize==='small'}"
-    [appearance]="selectFieldAppearance" [style.width.px]="selectFieldWidth"
-    [mdePopoverTriggerFor]="selectPopover"
+    [appearance]="selectFieldAppearance" [style.width.px]="selectFieldWidth" [mdePopoverTriggerFor]="selectPopover"
     mdePopoverTriggerOn="click" popoverTrigger="mdePopoverTrigger" [mdePopoverCloseOnClick]="false" (opened)="opened()"
     (closed)="closed()">
 
@@ -16,10 +15,13 @@
     <mat-icon matSuffix svgIcon="ngx-mat-ext-select-ddarrow"></mat-icon>
 
     <!--if icon to be displayed in field-->
-    <mat-icon matPrefix *ngIf="selectDisplayIconInField && component.icon?.type === 'svg' && component.icon?.id"
-      [svgIcon]="component.icon?.id || ''" [style.min-width.px]="35"></mat-icon>
-    <mat-icon matPrefix *ngIf="selectDisplayIconInField && component.icon?.type === 'basic' && component.icon?.id"
-      [style.min-width.px]="35">{{component.icon?.id || ''}}</mat-icon>
+    <span matPrefix *ngIf="selectDisplayIconInField && component.icon?.id">
+      <mat-icon *ngIf="component.icon?.type === 'svg'"
+        [svgIcon]="component.icon?.id || ''" [style.max-width.px]="35"></mat-icon>
+      <mat-icon *ngIf="component.icon?.type === 'basic'"
+        [style.max-width.px]="35">{{component.icon?.id || ''}}</mat-icon>
+      <span *ngIf="component.icon?.fieldDisplayGapPx"  [fxFlex]="(component.icon?.fieldDisplayGapPx || 0)+'px'"></span>
+    </span>
   </mat-form-field>
 
   <!--popover for drop down list-->

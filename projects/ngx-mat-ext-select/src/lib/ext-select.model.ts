@@ -18,7 +18,7 @@ export type SelectItemLabel = {
 /**
  * Icon to prefix item display
  */
-export type SelectItemIcon = { type: 'basic' | 'svg', id: string };
+export type SelectItemIcon = { type: 'basic' | 'svg', id: string, fieldDisplayGapPx?: number };
 
 /**
  * List item

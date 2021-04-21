@@ -10,13 +10,14 @@
     "types": [],
     "lib": [
       "dom",
-      "es2018"
+      "es2019"
     ]
   },
   "angularCompilerOptions": {
     "skipTemplateCodegen": true,
     "strictMetadataEmit": true,
-    "enableResourceInlining": true
+    "enableResourceInlining": true,
+    "fullTemplateTypeCheck": true
   },
   "exclude": [
     "src/test.ts",

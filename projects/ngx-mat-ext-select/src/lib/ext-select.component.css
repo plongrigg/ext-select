@@ -54,3 +54,12 @@
 .ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-suffix {
   top: 0.12em;
 }
+
+/* prevent popup when disabled */
+.ngx-mat-ext-select-field.mat-form-field-disabled {
+  pointer-events: none;
+}
+
+.ngx-mat-ext-select-field:not(.mat-form-field-disabled) {
+  pointer-events: initial;
+}

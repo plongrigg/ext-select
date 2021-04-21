@@ -7,12 +7,18 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { NgxMatSearchboxComponent, SearchData, SearchResult, SearchTerms } from '@fgrid-ngx/mat-searchbox';
 import { MdePopoverTrigger } from '@fgrid-ngx/mde';
 import { enableControls } from './ext-select.utils';
-import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, of, Subscription } from 'rxjs';
 import { distinctUntilKeyChanged, filter, map } from 'rxjs/operators';
 import { SelectedItem, SelectItem, SelectItemIcon, SelectItems } from './ext-select.model';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { arrowDropDownImage } from './ext-searchbox.images';
+
+/** TODO:
+ * filter option instead of search
+ * separate dataset for search
+ */
+
 
 /**
  * Implements a select (drop-down) component which has the following capabilities in addition to the standard mat-select
@@ -91,7 +97,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   /**
    * The width of the field displaying the selection
    */
-  @Input() public selectFieldWidth = 250;
+  @Input() public selectFieldWidth = 350;
 
   /**
    * Width of drop down.  If not set then the same as the select field width
@@ -120,7 +126,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   private disabled = false;
 
   @Input()
-  public get selectDisabled(): boolean { return this.disabled; }
+  public get selectDisabled(): boolean { return this.disabled || !this.selectItems || this.selectItems.size === 0; }
   public set selectDisabled(disabled: boolean) {
     this.disabled = disabled;
     this.setSelectFieldEnabledState();
@@ -188,7 +194,20 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   @Input() public searchStartsWith = false;
 
   /**
-   * Observable to deliver search data set to search component
+   * Independently supplied data for search.  If not set, the data set for the search is
+   * automatically derived from the selection data (value, label text)
+   */
+  private searchDataSource = new BehaviorSubject<SearchData>([]);
+
+  @Input()
+  public set searchData(searchData: SearchData) {
+    this.searchDataSource.next(searchData);
+  }
+
+  /**
+   * Observable to deliver search data set to search component. This is derived
+   * from input data (value + label text), but can be overridden by search dataset which is independently
+   * supplied
    */
   public searchData$: Observable<SearchData> = of([]);
 
@@ -260,16 +279,24 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     this.selectItems$ = this.selectItemsSource
       .pipe(map(selectItems => this.selectItemsAsArray(selectItems)));
 
-    // map selectItems to searchData so that search component is dynamically updated
-    this.searchData$ = this.selectItems$.pipe(
-      map(selectItems => selectItems.map(selectItem => [selectItem.value, ...selectItem.labels.map(label => label.text)])));
+    // search data is either supplied or mapped from select data if not supplied
+    this.searchData$ = combineLatest([
+      this.selectItems$,
+      this.searchDataSource
+    ]).pipe(map((([derived, supplied]) => {
+      if (!this.selectSearch) { return []; }
+      return supplied && supplied.length > 0 ?
+        supplied :
+        derived.map(selectItem => [selectItem.value, ...selectItem.labels.map(label => label.text)]);
+    })));
   }
 
   public ngOnInit(): void {
     // get the initially selected item from input, if supplied
     let initSelectedItem = this.selectedItem;
 
-    // if a selected item is not specified via input, attempt to get the value from the dataset
+    // if a selected item is not specified via input, attempt to get the value from the dataset, else
+    // assume the first item is selected
     if (!initSelectedItem && (this.selectItems?.size ?? 0) > 0) {
       const items = this.selectItemsAsArray(this.selectItems);
       initSelectedItem = items
@@ -293,7 +320,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     this.subscriptions.add(selectList.valueChanges
       .pipe(map((changes: string[]) => ({ key: changes.join(), changes })),
         distinctUntilKeyChanged('key'))
-      .subscribe(c => this.listSelectionChanged(c.changes) ));
+      .subscribe(c => this.listSelectionChanged(c.changes)));
   }
 
   /**
@@ -386,8 +413,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * always disabled.  Otherwise determined by input selectDisabled
    */
   private setSelectFieldEnabledState(): void {
-    const disabled = this.selectDisabled || !this.selectItems || this.selectItems.size === 0;
-    enableControls(this.selectForm, !disabled);
+    enableControls(this.selectForm, !this.selectDisabled);
   }
 
   /**
@@ -513,7 +539,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * Loads an SVG image to the MatIconRegistry from a string literal,
    * representing an svg
    */
-   private loadImage(
+  private loadImage(
     iconName: string,
     svg: string
   ): void {

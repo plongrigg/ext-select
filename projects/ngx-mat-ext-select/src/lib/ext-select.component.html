@@ -1,13 +1,16 @@
 <form [formGroup]="selectForm" autocomplete="off" fxLayout="row" fxLayoutAlign="center center"
   *ngIf="{icon: currentIcon | async} as component">
   <!--field to display selection, which also is trigger for drop down-list-->
-  <mat-form-field #textfield [ngClass]="{'ngx-mat-ext-select-field':true, 'ngx-mat-ext-select-small-input': selectFieldSize==='small'}"
-    [appearance]="selectFieldAppearance" [style.width.px]="selectFieldWidth" [mdePopoverTriggerFor]="selectPopover"
+  <mat-form-field #textfield
+    [ngClass]="{'ngx-mat-ext-select-field':true, 'ngx-mat-ext-select-small-input': selectFieldSize==='small'}"
+    [appearance]="selectFieldAppearance" [style.width.px]="selectFieldWidth"
+    [mdePopoverTriggerFor]="selectPopover"
     mdePopoverTriggerOn="click" popoverTrigger="mdePopoverTrigger" [mdePopoverCloseOnClick]="false" (opened)="opened()"
     (closed)="closed()">
+
+    <!--floating and placeholder label-->
     <mat-label>{{selectPlaceholder}}</mat-label>
-    <input #input matInput type="text" formControlName="selectField" [placeholder]="'selectPlaceholder'"
-      readonly>
+    <input #input matInput type="text" formControlName="selectField" [placeholder]="'selectPlaceholder'" readonly>
 
     <!--drop down arrow simulating a select component-->
     <mat-icon matSuffix svgIcon="ngx-mat-ext-select-ddarrow"></mat-icon>
@@ -22,8 +25,8 @@
   <!--popover for drop down list-->
   <mde-popover #selectPopover="mdePopover" [mdePopoverOverlapTrigger]="true" mdePopoverPositionY="below"
     mdePopoverPositionX="before" [mdePopoverOffsetY]="selectFieldSize === 'small' ? 15: 20" [mdePopoverOffsetX]="0">
-    <div class="mat-select-panel ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="5px" fxLayoutAlign="start center"
-      [style.min-width.px]="selectDDWidth" [style.min-height.px]="dropDownHeight">
+    <div class="mat-select-panel ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="5px"
+      fxLayoutAlign="start center" [style.min-width.px]="selectDDWidth" [style.min-height.px]="dropDownHeight">
 
       <!--search box-->
       <ngx-mat-searchbox #search *ngIf="selectSearch" [searchData]="(searchData$ | async) || []"
@@ -45,7 +48,8 @@
           <!--each row represents a item-->
           <mat-list-option
             *cdkVirtualFor="let item of selectItems$; trackBy:listTrackBy; let row = index; templateCacheSize: 0"
-            [value]=item.value [ngClass]="(searchRowFound(row) | async) ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
+            [value]=item.value
+            [ngClass]="(searchRowFound(row) | async) ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
             [style.height.px]="selectItemHeight">
 
             <!--icon if specified-->

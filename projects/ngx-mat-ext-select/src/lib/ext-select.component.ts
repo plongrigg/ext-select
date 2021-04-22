@@ -16,10 +16,7 @@ import { arrowDropDownImage } from './ext-searchbox.images';
 
 /** TODO:
  * filter option instead of search
- * separate dataset for search
  */
-
-
 /**
  * Implements a select (drop-down) component which has the following capabilities in addition to the standard mat-select
  * 1>  Multi-row labels 2> search field.  Otherwise it is designed to work much as the standard mat-select
@@ -170,7 +167,19 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * Determine if search looks for first match and then each click of the button looks for next match,
    * or whether all occurrences are searched for in each search request (=true)
    */
-  @Input() public searchMultiple = false;
+  private multiple = false;
+  @Input()
+  public get searchMultiple(): boolean { return (this.multiple || this.searchFilter) && this.selectSearch; }
+  public set searchMultiple(searchMultiple: boolean) { this.multiple = searchMultiple; }
+
+  /**
+   * Determines whether the search should filter the matched list items (true)
+   * of hightlight them instead (false)
+   */
+  private filter = false;
+  @Input()
+  public get searchFilter(): boolean { return this.filter && this.selectSearch; }
+  public set searchFilter(searchFilter: boolean) { this.filter = searchFilter; }
 
   /**
    * When searching for next match, skip other matched entries in cells on same row
@@ -268,6 +277,11 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    */
   public currentIcon: BehaviorSubject<SelectItemIcon> = new BehaviorSubject<SelectItemIcon>({ type: 'svg', id: '' });
 
+  /**
+   * Tracks open / close status of popup
+   */
+  private popupOpen = false;
+
   constructor(
     private iconRegistry: MatIconRegistry,
     private sanitizer: DomSanitizer) {
@@ -316,7 +330,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     // set initial enabled state
     this.setSelectFieldEnabledState();
 
-    // listen to selection changes
+    // listen to list selection changes
     this.subscriptions.add(selectList.valueChanges
       .pipe(map((changes: string[]) => ({ key: changes.join(), changes })),
         distinctUntilKeyChanged('key'))
@@ -463,9 +477,19 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Detect click on an option, and if popup is still open, close it
+   */
+  public clickOption(): void {
+    if (this.popupOpen) { this.trigger?.closePopover(); }
+  }
+
+  /**
    * Calculate style for an option line
    */
-  public getLineStyle(lineNo: number, style: Record<string, string> | undefined, fontSizePt: number | undefined): Record<string, string> {
+  public getLineStyle(
+    lineNo: number,
+    style: Record<string, string | undefined | null> | undefined,
+    fontSizePt: number | undefined): Record<string, string | undefined | null> {
     const cstyle = style ? { ...style } : {};
 
     // if the font size is defined, put it in style, overriding any existing font-style
@@ -503,6 +527,8 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * Popup opened
    */
   public opened(): void {
+    this.popupOpen = true;
+
     // adjust viewport if necessary
     if (isNaN(this.viewport?.getRenderedRange().start ?? 0) || isNaN(this.viewport?.getRenderedRange().end ?? 0)) {
       this.viewport?.setRenderedRange({ start: 0, end: 0 }); // will adjust
@@ -515,10 +541,8 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
       // when there are icons involved
       if (!this.firstOpen.value) {
         this.firstOpen.next(true);
-      }
-
-      // scroll to currently selected item
-      this.ensureSelectionVisible();
+        setTimeout(() => this.ensureSelectionVisible());
+      } else { this.ensureSelectionVisible(); }
     });
   }
 
@@ -527,6 +551,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    */
   public closed(): void {
     // reset the search component
+    this.popupOpen = false;
     if (this.selectSearch) {
       this.rowsFound.next([]);
       this.searchComponent?.clearSearchField();

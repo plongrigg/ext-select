@@ -4,12 +4,16 @@
 
 /* extends mat-select-panel -alos include class="mat-select-panel and make sure these attributes override*/
 .ngx-mat-ext-select-panel {
-  padding: 0px !important;
+  padding-top: 5px !important;
   overflow:hidden !important;
 }
 
 .ngx-mat-ext-select-list {
   padding-top: 0px;
+}
+
+.ngx-mat-ext-select-list:focus {
+  outline: none !important;
 }
 
 .ngx-mat-ext-select-search-found {

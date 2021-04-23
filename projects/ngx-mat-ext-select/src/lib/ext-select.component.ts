@@ -4,19 +4,16 @@ import {
   OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { NgxMatSearchboxComponent, SearchData, SearchResult, SearchTerms } from '@fgrid-ngx/mat-searchbox';
+import { NgxMatSearchboxComponent, SearchData, SearchResult, SearchResults, SearchTerms } from '@fgrid-ngx/mat-searchbox';
 import { MdePopoverTrigger } from '@fgrid-ngx/mde';
 import { enableControls } from './ext-select.utils';
 import { BehaviorSubject, combineLatest, Observable, of, Subscription } from 'rxjs';
-import { distinctUntilKeyChanged, filter, map } from 'rxjs/operators';
+import { defaultIfEmpty, distinctUntilKeyChanged, filter, find, map, mapTo } from 'rxjs/operators';
 import { SelectedItem, SelectItem, SelectItemIcon, SelectItems } from './ext-select.model';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { arrowDropDownImage } from './ext-searchbox.images';
 
-/** TODO:
- * filter option instead of search
- */
 /**
  * Implements a select (drop-down) component which has the following capabilities in addition to the standard mat-select
  * 1>  Multi-row labels 2> search field.  Otherwise it is designed to work much as the standard mat-select
@@ -204,7 +201,9 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
 
   /**
    * Independently supplied data for search.  If not set, the data set for the search is
-   * automatically derived from the selection data (value, label text)
+   * automatically derived from the selection data (value, label text).  If supplied separately,
+   * the rows in the search dataset must be a one-to-one match with the select dataset, i.e one search row
+   * per select row, in the same order
    */
   private searchDataSource = new BehaviorSubject<SearchData>([]);
 
@@ -258,9 +257,9 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   public selectForm = new FormGroup({});
 
   /**
-   * Tracks row(s) found on search
+   * Tracks results of search
    */
-  private rowsFound: BehaviorSubject<number[]> = new BehaviorSubject(new Array<number>());
+  private searchResults: BehaviorSubject<SearchResults> = new BehaviorSubject([] as SearchResults);
 
   /**
    * Used to track and unsubsribe from all subscriptions
@@ -290,8 +289,23 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     this.loadImage('ngx-mat-ext-select-ddarrow', arrowDropDownImage);
 
     // current item list, which can change dynamically
-    this.selectItems$ = this.selectItemsSource
-      .pipe(map(selectItems => this.selectItemsAsArray(selectItems)));
+    this.selectItems$ = combineLatest([this.selectItemsSource, this.searchResults]).pipe(
+      map(([selectItems, searchResults]) => {
+        const items = this.selectItemsAsArray(selectItems);
+
+        // determine if filtering should occur - if not return all items
+        if (!this.searchFilter) { return items; }
+
+        // if the search is not valid i.e. if the search string or range is empty then return all items
+        if (!searchResults.searchParams) { return items; }
+        if (searchResults.searchParams.search.trim().length === 0 && !searchResults.searchParams.searchRange) { return items; }
+
+        // filter items based on search rows found
+        const searchRows = Array.from(new Set(searchResults.map(searchResult => searchResult.rowIndex)));
+        return items.filter((item, index) => searchRows.includes(index));
+      })
+    );
+
 
     // search data is either supplied or mapped from select data if not supplied
     this.searchData$ = combineLatest([
@@ -507,8 +521,8 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   /**
    * Responds to users Search field result emission
    */
-  public searched(searchResults: SearchResult[]): void {
-    this.rowsFound.next(Array.from(new Set(searchResults.map(searchResult => searchResult.rowIndex))));
+  public searched(searchResults: SearchResults): void {
+    this.searchResults.next(searchResults);
 
     // scroll to the first found item to ensure it is visible
     if (searchResults.length > 0) {
@@ -520,7 +534,14 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * Used for each option in list, to query as to whether it is current search found set
    */
   public searchRowFound(row: number): Observable<boolean> {
-    return this.rowsFound.pipe(filter(rows => rows.includes(row)), map(rows => rows.length > 0));
+    return this.searchResults.pipe(
+      // map to array of unique rows found
+      map(searchResults => Array.from(new Set(searchResults.map(searchResult => searchResult.rowIndex)))),
+      // only include target rows
+      filter(rows => rows.includes(row)),
+      // map to boolean
+      map(rows => rows.length > 0)
+    );
   }
 
   /**
@@ -553,11 +574,10 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     // reset the search component
     this.popupOpen = false;
     if (this.selectSearch) {
-      this.rowsFound.next([]);
+      this.searchResults.next([]);
       this.searchComponent?.clearSearchField();
     }
   }
-
 
   /**
    * Loads an SVG image to the MatIconRegistry from a string literal,
@@ -578,7 +598,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    */
   public ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
-    this.rowsFound.complete();
+    this.searchResults.complete();
     this.selectItemsSource.complete();
   }
 }

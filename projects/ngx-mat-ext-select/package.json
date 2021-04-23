@@ -31,6 +31,6 @@
     "tslib": "^2.0.0",
     "@angular/flex-layout": "*",
     "@fgrid-ngx/mde": ">= 3.0.3",
-    "@fgrid-ngx/mat-searchbox": ">=1.0.8"
+    "@fgrid-ngx/mat-searchbox": ">=1.0.10"
   }
 }

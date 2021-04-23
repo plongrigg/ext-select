@@ -52,7 +52,7 @@
           <ng-container *cdkVirtualFor="let item of selectItems$; let row = index; trackBy:listTrackBy;  templateCacheSize: 0">
             <mat-list-option
               [value]=item.value (click)="clickOption()"
-              [ngClass]="(searchRowFound(row) | async) ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
+              [ngClass]="!searchFilter && (searchRowFound(row) | async)  ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
               [style.height.px]="selectItemHeight">
 
               <!--icon if specified-->

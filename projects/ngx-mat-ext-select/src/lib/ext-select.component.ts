@@ -4,15 +4,20 @@ import {
   OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { NgxMatSearchboxComponent, SearchData, SearchResult, SearchResults, SearchTerms } from '@fgrid-ngx/mat-searchbox';
-import { MdePopoverTrigger } from '@fgrid-ngx/mde';
-import { enableControls } from './ext-select.utils';
-import { BehaviorSubject, combineLatest, Observable, of, Subscription } from 'rxjs';
-import { defaultIfEmpty, distinctUntilKeyChanged, filter, find, map, mapTo } from 'rxjs/operators';
-import { SelectedItem, SelectItem, SelectItemIcon, SelectItems } from './ext-select.model';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
+import { NgxMatSearchboxComponent, SearchData, SearchResults, SearchTerms } from '@fgrid-ngx/mat-searchbox';
+import { MdePopoverTrigger } from '@fgrid-ngx/mde';
+import { BehaviorSubject, combineLatest, Observable, of, Subscription } from 'rxjs';
+import { distinctUntilKeyChanged, filter, map, switchMap, take } from 'rxjs/operators';
 import { arrowDropDownImage } from './ext-searchbox.images';
+import { SelectedItem, SelectItem, SelectItemIcon, SelectItems } from './ext-select.model';
+import { enableControls } from './ext-select.utils';
+
+/** TODO
+ *  check efficiency of dynamic array conversions
+ *  play around with min-max buffer to see if we can provide a no virula scroll option
+ */
 
 /**
  * Implements a select (drop-down) component which has the following capabilities in addition to the standard mat-select
@@ -127,9 +132,58 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Determine the currently selected item.  This can be used to specify the initially
+   * selected item for the component.  If the input is attached to an observable, allows the
+   * currenly selected item to be adjusted from an external action (i.e. other than a selection in
+   * the drop down list)
+   */
+  private sselectedItem?: SelectedItem | null;
+
+  @Input()
+  public get selectedItem(): SelectedItem | undefined | null { return this.sselectedItem; }
+  public set selectedItem(selectedItem: SelectedItem | undefined | null) {
+    this.sselectedItem = selectedItem;
+    this.updateSelectField(selectedItem);
+    this.updateSelection(selectedItem);
+  }
+
+  /**
+   * Applies angular material apperance to the field
+   */
+  @Input() public selectFieldAppearance: 'outline' | 'standard' | 'fill' | 'legacy' = 'outline';
+
+  /**
+   * If 'small' then the field has a font of 9pt and the margins, padding etc. are reduced so that
+   * the field can comfortably fit on a toolbar.
+   */
+  @Input() public selectFieldSize: 'small' | 'default' = 'small';
+
+  /**
    * Determines if there is a search component appearing on top of the list
    */
   @Input() public selectSearch = true;
+
+  /**
+   * Vertical offset relative to top-left of select field that popup is displyed
+   */
+  private ddoffsetY?: number = undefined;
+
+  @Input()
+  public get selectDDOffsetY(): number {
+    if (this.ddoffsetY !== undefined) { return this.ddoffsetY; }
+    return this.selectFieldSize === 'small' ? 15 : 20;
+  }
+  public set selectDDOffsetY(offset: number) { this.ddoffsetY = offset; }
+
+  /**
+   * Horizontal offset relative to top-left of select field that popup is displyed
+   */
+  private ddoffsetX = 0;
+
+  @Input()
+  public get selectDDOffsetX(): number { return this.ddoffsetX; }
+  public set selectDDOffsetX(offset: number) { this.ddoffsetX = offset; }
+
 
   /**
    * Determines if the extended search capabilities are provided in the
@@ -220,33 +274,6 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   public searchData$: Observable<SearchData> = of([]);
 
   /**
-   * Determine the currently selected item.  This can be used to specify the initially
-   * selected item for the component.  If the input is attached to an observable, allows the
-   * currenly selected item to be adjusted from an external action (i.e. other than a selection in
-   * the drop down list)
-   */
-  private sselectedItem?: SelectedItem | null;
-
-  @Input()
-  public get selectedItem(): SelectedItem | undefined | null { return this.sselectedItem; }
-  public set selectedItem(selectedItem: SelectedItem | undefined | null) {
-    this.sselectedItem = selectedItem;
-    this.updateSelectField(selectedItem);
-    this.updateSelection(selectedItem);
-  }
-
-  /**
-   * Applies angular material apperance to the field
-   */
-  @Input() public selectFieldAppearance: 'outline' | 'standard' | 'fill' | 'legacy' = 'outline';
-
-  /**
-   * If 'small' then the field has a font of 9pt and the margins, padding etc. are reduced so that
-   * the field can comfortably fit on a toolbar.
-   */
-  @Input() public selectFieldSize: 'small' | 'default' = 'small';
-
-  /**
    * Reports a selection change to the parent
    */
   @Output() public itemSelected: EventEmitter<SelectedItem> = new EventEmitter();
@@ -288,7 +315,8 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     // load drop-down arrow image into registry
     this.loadImage('ngx-mat-ext-select-ddarrow', arrowDropDownImage);
 
-    // current item list, which can change dynamically
+    // current item list, which can change dynamically, and if search filer is on will be limited
+    // by the search criteria
     this.selectItems$ = combineLatest([this.selectItemsSource, this.searchResults]).pipe(
       map(([selectItems, searchResults]) => {
         const items = this.selectItemsAsArray(selectItems);
@@ -302,20 +330,21 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
 
         // filter items based on search rows found
         const searchRows = Array.from(new Set(searchResults.map(searchResult => searchResult.rowIndex)));
-        return items.filter((item, index) => searchRows.includes(index));
+        const listItems = items.filter((item, index) => searchRows.includes(index));
+
+        return listItems;
       })
     );
 
-
     // search data is either supplied or mapped from select data if not supplied
     this.searchData$ = combineLatest([
-      this.selectItems$,
+      this.selectItemsSource,
       this.searchDataSource
     ]).pipe(map((([derived, supplied]) => {
       if (!this.selectSearch) { return []; }
       return supplied && supplied.length > 0 ?
         supplied :
-        derived.map(selectItem => [selectItem.value, ...selectItem.labels.map(label => label.text)]);
+        this.selectItemsAsArray(derived).map(selectItem => [selectItem.value, ...selectItem.labels.map(label => label.text)]);
     })));
   }
 
@@ -364,7 +393,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Remaps the SelectItems structure to an array of SelectItem
+   * Remaps the SelectItems structure to an array of SelectItem, in map insert order
    */
   private selectItemsAsArray(selectItems: SelectItems | null | undefined): SelectItem[] {
     if (!selectItems) { return []; }
@@ -449,9 +478,10 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   private ensureSelectionVisible(): void {
     const value = this.getSelectedValue();
     if (!value || !this.selectItems || this.selectItems.size === 0) { return; }
-    const index = Array.from(this.selectItems.keys()).indexOf(value);
-    if (index < 0) { return; }
-    this.viewport?.scrollToOffset(this.selectItemHeight * index);
+    this.valueToListIndex(value).pipe(take(1)).subscribe(listIndex => {
+      if (listIndex < 0) { return; }
+      this.viewport?.scrollToOffset(this.selectItemHeight * listIndex);
+    });
   }
 
   /**
@@ -525,22 +555,26 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     this.searchResults.next(searchResults);
 
     // scroll to the first found item to ensure it is visible
-    if (searchResults.length > 0) {
-      this.viewport?.scrollToOffset(this.selectItemHeight * (searchResults[0].rowIndex));
+    if (searchResults.length > 0 && !this.searchFilter) {
+      const dataIndex = searchResults[0].rowIndex;
+      this.dataToListIndex(dataIndex).pipe(take(1)).subscribe(listIndex =>
+        this.viewport?.scrollToOffset(this.selectItemHeight * listIndex));
     }
   }
 
   /**
    * Used for each option in list, to query as to whether it is current search found set
    */
-  public searchRowFound(row: number): Observable<boolean> {
+  public searchValueFound(value: number | string): Observable<boolean> {
     return this.searchResults.pipe(
-      // map to array of unique rows found
+      // map to array of unique rows found in search
       map(searchResults => Array.from(new Set(searchResults.map(searchResult => searchResult.rowIndex)))),
-      // only include target rows
-      filter(rows => rows.includes(row)),
-      // map to boolean
-      map(rows => rows.length > 0)
+      // convert to values
+      switchMap(searchRows => this.dataIndiciesToValues(searchRows)),
+      // does it include this value
+      filter(values => values.includes(value)),
+      // map to true if value found
+      map(values => values.length > 0)
     );
   }
 
@@ -591,6 +625,37 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
       iconName,
       this.sanitizer.bypassSecurityTrustHtml(svg)
     );
+  }
+
+  /**
+   * Get the current index in list for a item value
+   */
+  private valueToListIndex(value: string | number | undefined): Observable<number> {
+    return this.selectItems$.pipe(map(selectItems => selectItems.findIndex(selectItem => selectItem.value === value)));
+  }
+
+  /**
+   * Get value in full selectItem data set for an index
+   */
+  private dataIndexToValue(dataIndex: number): Observable<string | number | undefined> {
+    return this.selectItemsSource.pipe(map(selectItems => this.selectItemsAsArray(selectItems)[dataIndex]?.value));
+  }
+
+  /**
+   * Get values for list of full dataset indexes
+   */
+  private dataIndiciesToValues(dataIndicies: number[]): Observable<(string | number)[]> {
+    if (dataIndicies.length === 0) { return of([]); }
+    return this.selectItemsSource.pipe(
+      map(selectItems => this.selectItemsAsArray(selectItems).filter((selectItem, index) => dataIndicies.includes(index))),
+      map(selectItems => selectItems.map(selectItem => selectItem.value)));
+  }
+
+  /**
+   * Convert from full dataset index to current list index
+   */
+  private dataToListIndex(dataIndex: number): Observable<number> {
+    return this.dataIndexToValue(dataIndex).pipe(switchMap(value => this.valueToListIndex(value)));
   }
 
   /**

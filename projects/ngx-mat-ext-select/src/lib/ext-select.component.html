@@ -27,7 +27,7 @@
 
   <!--popover for drop down list-->
   <mde-popover #selectPopover="mdePopover" [mdePopoverOverlapTrigger]="true" mdePopoverPositionY="below"
-    mdePopoverPositionX="before" [mdePopoverOffsetY]="selectFieldSize === 'small' ? 15: 20" [mdePopoverOffsetX]="0">
+    mdePopoverPositionX="before" [mdePopoverOffsetY]="selectDDOffsetY" [mdePopoverOffsetX]="selectDDOffsetX">
     <div class="mat-select-panel ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="0px"
       fxLayoutAlign="start center" [style.min-width.px]="selectDDWidth" [style.min-height.px]="dropDownHeight">
 
@@ -52,7 +52,7 @@
           <ng-container *cdkVirtualFor="let item of selectItems$; let row = index; trackBy:listTrackBy;  templateCacheSize: 0">
             <mat-list-option
               [value]=item.value (click)="clickOption()"
-              [ngClass]="!searchFilter && (searchRowFound(row) | async)  ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
+              [ngClass]="(searchValueFound(item.value) | async)  ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
               [style.height.px]="selectItemHeight">
 
               <!--icon if specified-->

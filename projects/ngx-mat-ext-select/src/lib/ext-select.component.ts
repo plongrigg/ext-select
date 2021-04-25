@@ -389,6 +389,11 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     return height;
   }
 
+  public get viewportHeight(): number {
+    const noItems = Math.min(this.selectNoItemsVisible, this.selectItems?.size ?? 0);
+    return noItems * this.selectItemHeight;
+  }
+
   /**
    * Remaps the SelectItems structure to an array of SelectItem, in map insert order
    */

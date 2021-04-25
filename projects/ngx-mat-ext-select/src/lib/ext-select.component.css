@@ -58,6 +58,10 @@
 .ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-suffix {
   top: 0.12em;
 }
+.ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-prefix {
+  top: 0.12em;
+}
+
 
 /* prevent popup when disabled */
 .ngx-mat-ext-select-field.mat-form-field-disabled {

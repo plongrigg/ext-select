@@ -15,8 +15,7 @@ import { SelectedItem, SelectItem, SelectItemIcon, SelectItems } from './ext-sel
 import { enableControls } from './ext-select.utils';
 
 /** TODO
- *  check efficiency of dynamic array conversions
- *  play around with min-max buffer to see if we can provide a no virula scroll option
+ *  play around with min-max buffer to see if we can provide a no virtual scroll option
  */
 
 /**
@@ -27,6 +26,7 @@ import { enableControls } from './ext-select.utils';
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'ngx-mat-ext-select',
+  exportAs: 'ngxMatExtSelect',
   templateUrl: './ext-select.component.html',
   styleUrls: ['./ext-select.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,9 +53,11 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   private searchComponent?: NgxMatSearchboxComponent;
 
   /**
-   * Data source for select
+   * Data source for select - keep both a map and an array for improved performance
    */
   private selectItemsSource: BehaviorSubject<SelectItems> = new BehaviorSubject(new Map());
+
+  private selectItemsArray: BehaviorSubject<SelectItem[]> = new BehaviorSubject([] as SelectItem[]);
 
   public selectItems$: Observable<SelectItem[]> = of([]);
 
@@ -64,6 +66,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   public set selectItems(selectItems: SelectItems | null | undefined) {
     if (!selectItems) {
       this.selectItemsSource.next(new Map());
+      this.selectItemsArray.next([]);
     }
     else {
       // include the key value in the SelectItem object in case not there
@@ -71,6 +74,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
         selectItem.value = key;
       });
       this.selectItemsSource.next(selectItems);
+      this.selectItemsArray.next(this.selectItemsAsArray(selectItems));
     }
     this.setSelectFieldEnabledState();
 
@@ -317,34 +321,31 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
 
     // current item list, which can change dynamically, and if search filer is on will be limited
     // by the search criteria
-    this.selectItems$ = combineLatest([this.selectItemsSource, this.searchResults]).pipe(
+    this.selectItems$ = combineLatest([this.selectItemsArray, this.searchResults]).pipe(
       map(([selectItems, searchResults]) => {
-        const items = this.selectItemsAsArray(selectItems);
 
         // determine if filtering should occur - if not return all items
-        if (!this.searchFilter) { return items; }
+        if (!this.searchFilter) { return selectItems; }
 
         // if the search is not valid i.e. if the search string or range is empty then return all items
-        if (!searchResults.searchParams) { return items; }
-        if (searchResults.searchParams.search.trim().length === 0 && !searchResults.searchParams.searchRange) { return items; }
+        if (!searchResults.searchParams ||
+          (searchResults.searchParams.search.trim().length === 0 && !searchResults.searchParams.searchRange)) { return selectItems; }
 
         // filter items based on search rows found
         const searchRows = Array.from(new Set(searchResults.map(searchResult => searchResult.rowIndex)));
-        const listItems = items.filter((item, index) => searchRows.includes(index));
-
-        return listItems;
+        return selectItems.filter((item, index) => searchRows.includes(index));
       })
     );
 
     // search data is either supplied or mapped from select data if not supplied
     this.searchData$ = combineLatest([
-      this.selectItemsSource,
+      this.selectItemsArray,
       this.searchDataSource
     ]).pipe(map((([derived, supplied]) => {
       if (!this.selectSearch) { return []; }
       return supplied && supplied.length > 0 ?
         supplied :
-        this.selectItemsAsArray(derived).map(selectItem => [selectItem.value, ...selectItem.labels.map(label => label.text)]);
+        derived.map(selectItem => [selectItem.value, ...selectItem.labels.map(label => label.text)]);
     })));
   }
 
@@ -354,12 +355,12 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
 
     // if a selected item is not specified via input, attempt to get the value from the dataset, else
     // assume the first item is selected
-    if (!initSelectedItem && (this.selectItems?.size ?? 0) > 0) {
-      const items = this.selectItemsAsArray(this.selectItems);
-      initSelectedItem = items
+    const selectItems = this.selectItemsArray.getValue();
+    if (!initSelectedItem && (selectItems.length ?? 0) > 0) {
+      initSelectedItem = selectItems
         .filter(item => !!item.selected).map(item => ({ value: item.value ?? '', display: item.display }))[0];
       if (!initSelectedItem) {
-        initSelectedItem = { ...items[0], value: items[0].value ?? '' };
+        initSelectedItem = { ...selectItems[0], value: selectItems[0].value ?? '' };
       }
     }
 
@@ -444,7 +445,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
       this.currentIcon.next(placeholder);
       return;
     }
-    const icon = Array.from(this.selectItems?.values() || []).find(selectItem => selectItem.value === value)?.icon || placeholder;
+    const icon = this.selectItems?.get(value)?.icon || placeholder;
     const currentIcon = this.currentIcon.getValue();
     if (currentIcon.type === icon.type && currentIcon.id === icon.id) { return; }
     this.currentIcon.next(icon);
@@ -638,7 +639,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * Get value in full selectItem data set for an index
    */
   private dataIndexToValue(dataIndex: number): Observable<string | number | undefined> {
-    return this.selectItemsSource.pipe(map(selectItems => this.selectItemsAsArray(selectItems)[dataIndex]?.value));
+    return this.selectItemsArray.pipe(map(selectItems => selectItems[dataIndex]?.value));
   }
 
   /**
@@ -646,8 +647,8 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    */
   private dataIndiciesToValues(dataIndicies: number[]): Observable<(string | number)[]> {
     if (dataIndicies.length === 0) { return of([]); }
-    return this.selectItemsSource.pipe(
-      map(selectItems => this.selectItemsAsArray(selectItems).filter((selectItem, index) => dataIndicies.includes(index))),
+    return this.selectItemsArray.pipe(
+      map(selectItems => selectItems.filter((selectItem, index) => dataIndicies.includes(index))),
       map(selectItems => selectItems.map(selectItem => selectItem.value)));
   }
 

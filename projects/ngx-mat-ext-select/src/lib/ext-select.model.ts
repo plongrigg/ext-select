@@ -18,17 +18,20 @@ export type SelectItemLabel = {
 /**
  * Icon to prefix item display
  */
-export type SelectItemIcon = { type: 'basic' | 'svg', id: string, fieldDisplayIconGapPx?: number };
+export type SelectItemIcon = {
+  type: 'basic' | 'svg', id: string,  // if an svg it should be registered in the icon registry, basic is a css based icon
+  fieldDisplayIconGapPx?: number      // gap between icon and display in the field, needed if icon does not include a whitespace border
+};
 
 /**
  * List item
  */
 export type SelectItem = {
-  value: string | number;
+  value: string | number;   // no need to populate this field for input, as it is the key of the map
   icon?: SelectItemIcon;
   labels: SelectItemLabel[];
-  display: string;
-  selected?: boolean;
+  display: string;         // single-line representation of item for field display
+  selected?: boolean;      // initially selected item
 };
 
 /**

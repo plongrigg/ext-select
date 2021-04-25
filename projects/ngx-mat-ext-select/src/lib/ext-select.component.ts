@@ -14,10 +14,6 @@ import { arrowDropDownImage } from './ext-searchbox.images';
 import { SelectedItem, SelectItem, SelectItemIcon, SelectItems } from './ext-select.model';
 import { enableControls } from './ext-select.utils';
 
-/** TODO
- *  play around with min-max buffer to see if we can provide a no virtual scroll option
- */
-
 /**
  * Implements a select (drop-down) component which has the following capabilities in addition to the standard mat-select
  * 1>  Multi-row labels 2> search field.  Otherwise it is designed to work much as the standard mat-select
@@ -666,5 +662,6 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
     this.searchResults.complete();
     this.selectItemsSource.complete();
+    this.selectItemsArray.complete();
   }
 }

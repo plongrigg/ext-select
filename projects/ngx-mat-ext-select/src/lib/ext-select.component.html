@@ -28,7 +28,7 @@
   <!--popover for drop down list-->
   <mde-popover #selectPopover="mdePopover" [mdePopoverOverlapTrigger]="true" mdePopoverPositionY="below"
     mdePopoverPositionX="before" [mdePopoverOffsetY]="selectDDOffsetY" [mdePopoverOffsetX]="selectDDOffsetX">
-    <div class="mat-select-panel ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="0px"
+    <div class="ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="0px"
       fxLayoutAlign="start center">
 
       <!--search box-->
@@ -64,7 +64,7 @@
 
               <!--item representation multi-line labels-->
               <div matLine *ngFor="let label of item.labels; let lrow = index"
-                [style]="getLineStyle(lrow, label.style, label.fontSizePt)">{{label.text}}</div>
+                [ngStyle]="getLineStyle(lrow, label.style, label.fontSizePt)">{{label.text}}</div>
 
               <mat-divider *ngIf="item.labels.length > 1"></mat-divider>
             </mat-list-option>

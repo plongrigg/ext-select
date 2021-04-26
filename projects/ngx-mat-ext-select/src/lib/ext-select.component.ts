@@ -378,17 +378,8 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Determine the appropriate height for the drop-down component
+   * Determine the appropriate height for the drop-down vieport component
    */
-  public get dropDownHeight(): number {
-    let height = this.selectSearch ? 52 : 0; // space for searchbox + gap
-
-    const noItems = Math.min(this.selectNoItemsVisible, this.selectItems?.size ?? 0);
-    height += (noItems * this.selectItemHeight);
-
-    return height;
-  }
-
   public get viewportHeight(): number {
     const noItems = Math.min(this.selectNoItemsVisible, this.selectItems?.size ?? 0);
     return noItems * this.selectItemHeight;

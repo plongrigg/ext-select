@@ -27,7 +27,7 @@ export type SelectItemIcon = {
  * List item
  */
 export type SelectItem = {
-  value: string | number;   // no need to populate this field for input, as it is the key of the map
+  value?: string | number;   // no need to populate this field for input, as it is the key of the map
   icon?: SelectItemIcon;
   labels: SelectItemLabel[];
   display: string;         // single-line representation of item for field display

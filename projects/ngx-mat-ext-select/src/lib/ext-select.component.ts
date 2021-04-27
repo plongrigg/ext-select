@@ -641,7 +641,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     if (dataIndicies.length === 0) { return of([]); }
     return this.selectItemsArray.pipe(
       map(selectItems => selectItems.filter((selectItem, index) => dataIndicies.includes(index))),
-      map(selectItems => selectItems.map(selectItem => selectItem.value)));
+      map(selectItems => selectItems.map(selectItem => selectItem?.value || '')));
   }
 
   /**

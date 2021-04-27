@@ -1,7 +1,7 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import {
   ChangeDetectionStrategy, Component, EventEmitter, Input,
-  OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation
+  OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren, ViewEncapsulation
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatIconRegistry } from '@angular/material/icon';
@@ -11,6 +11,7 @@ import { MdePopoverTrigger } from '@fgrid-ngx/mde';
 import { BehaviorSubject, combineLatest, Observable, of, Subscription } from 'rxjs';
 import { distinctUntilKeyChanged, filter, map, switchMap, take } from 'rxjs/operators';
 import { arrowDropDownImage } from './ext-searchbox.images';
+import { ScrollToDirective } from './ext-select-scroll-to.directive';
 import { SelectedItem, SelectItem, SelectItemIcon, SelectItems } from './ext-select.model';
 import { enableControls } from './ext-select.utils';
 
@@ -47,6 +48,13 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    */
   @ViewChild('search')
   private searchComponent?: NgxMatSearchboxComponent;
+
+  /**
+   * List of options under conventional (non-virtual)
+   * scrolling
+   */
+  @ViewChildren(ScrollToDirective)
+  private options?: QueryList<ScrollToDirective>;
 
   /**
    * Data source for select - keep both a map and an array for improved performance
@@ -159,11 +167,6 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   @Input() public selectFieldSize: 'small' | 'default' = 'small';
 
   /**
-   * Determines if there is a search component appearing on top of the list
-   */
-  @Input() public selectSearch = true;
-
-  /**
    * Vertical offset relative to top-left of select field that popup is displyed
    */
   private ddoffsetY?: number = undefined;
@@ -184,6 +187,17 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   public get selectDDOffsetX(): number { return this.ddoffsetX; }
   public set selectDDOffsetX(offset: number) { this.ddoffsetX = offset; }
 
+  /**
+   * Determines if virtual scrolling should be used for list.  Virtual scrolling
+   * is more efficient in terms of DOM usage for large lists, but scrolling might not
+   * be as smooth for smaller lists - repainting is slower
+   */
+  @Input() public selectVirtualScroll = false;
+
+  /**
+   * Determines if there is a search component appearing on top of the list
+   */
+  @Input() public selectSearch = true;
 
   /**
    * Determines if the extended search capabilities are provided in the
@@ -473,8 +487,17 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     if (!value || !this.selectItems || this.selectItems.size === 0) { return; }
     this.valueToListIndex(value).pipe(take(1)).subscribe(listIndex => {
       if (listIndex < 0) { return; }
-      this.viewport?.scrollToOffset(this.selectItemHeight * listIndex);
+      this.scrollTo(listIndex);
     });
+  }
+
+  /** Scrolls to  list index */
+  private scrollTo(listIndex: number): void {
+    if (this.selectVirtualScroll) { this.viewport?.scrollToOffset(this.selectItemHeight * listIndex); }
+    else {
+      const scroller = this.options?.get(listIndex);
+      scroller?.scrollTo();
+    }
   }
 
   /**
@@ -551,7 +574,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     if (searchResults.length > 0 && !this.searchFilter) {
       const dataIndex = searchResults[0].rowIndex;
       this.dataToListIndex(dataIndex).pipe(take(1)).subscribe(listIndex =>
-        this.viewport?.scrollToOffset(this.selectItemHeight * listIndex));
+        this.scrollTo(listIndex));
     }
   }
 
@@ -578,11 +601,13 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     this.popupOpen = true;
 
     // adjust viewport if necessary
-    if (isNaN(this.viewport?.getRenderedRange().start ?? 0) || isNaN(this.viewport?.getRenderedRange().end ?? 0)) {
-      this.viewport?.setRenderedRange({ start: 0, end: 0 }); // will adjust
-      this.viewport?.setRenderedContentOffset(0);
+    if (this.selectVirtualScroll) {
+      if (isNaN(this.viewport?.getRenderedRange().start ?? 0) || isNaN(this.viewport?.getRenderedRange().end ?? 0)) {
+        this.viewport?.setRenderedRange({ start: 0, end: 0 }); // will adjust
+        this.viewport?.setRenderedContentOffset(0);
+      }
+      this.viewport?.checkViewportSize();
     }
-    this.viewport?.checkViewportSize();
 
     setTimeout(() => {
       // delay rendering of virtual scroll on first-open to get around a Firefox rendering issue

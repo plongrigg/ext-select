@@ -4,7 +4,6 @@
 
 /* extends mat-select-panel -alos include class="mat-select-panel and make sure these attributes override*/
 .ngx-mat-ext-select-panel {
-  padding-top: 5px;
   overflow:hidden;
   box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),0px 4px 5px 0px rgba(0, 0, 0, 0.14),0px 1px 10px 0px rgba(0, 0, 0, 0.12);
   background: white;
@@ -12,6 +11,12 @@
 
 .ngx-mat-ext-select-list {
   padding-top: 0px;
+  overflow: none;
+}
+
+.ngx-mat-ext-select-list-scroll {
+  padding-top: 0px;
+  overflow-y: auto;
 }
 
 .ngx-mat-ext-select-list:focus {

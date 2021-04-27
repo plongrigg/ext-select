@@ -192,7 +192,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * is more efficient in terms of DOM usage for large lists, but scrolling might not
    * be as smooth for smaller lists - repainting is slower
    */
-  @Input() public selectVirtualScroll = false;
+  @Input() public selectVirtualScroll = true;
 
   /**
    * Determines if there is a search component appearing on top of the list

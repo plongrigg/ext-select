@@ -28,7 +28,7 @@
   <!--popover for drop down list-->
   <mde-popover #selectPopover="mdePopover" [mdePopoverOverlapTrigger]="true" mdePopoverPositionY="below"
     mdePopoverPositionX="before" [mdePopoverOffsetY]="selectDDOffsetY" [mdePopoverOffsetX]="selectDDOffsetX">
-    <div class="ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="0px" fxLayoutAlign="start center"
+    <div class="ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="5px" fxLayoutAlign="start center"
       [style.padding-top.px]="selectSearch ? 5 : 0">
 
       <!--search box-->
@@ -73,7 +73,8 @@
 
       <!--standard scrolled list-->
       <mat-selection-list *ngIf="!selectVirtualScroll" #list class="ngx-mat-ext-select-list-scroll"
-        formControlName="selectList" [multiple]="false" [style.height.px]="viewportHeight">
+        formControlName="selectList" [multiple]="false" [style.height.px]="viewportHeight"
+        [style.width.px]="selectDDWidth">
 
         <!--each row represents a item-->
         <ng-container *ngFor="let item of selectItems$ | async; trackBy:listTrackBy;">

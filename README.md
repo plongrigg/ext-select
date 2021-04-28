@@ -150,7 +150,7 @@ In addition the following package(s) will be automatically installed if not alre
 |searchDebounceMS | 200 | When doing continuous searches, the debounce time in milliseconds to be applied to key stokes. |
 |searchCaseSensitive | false | Determines if searches are case sensitive by default. |
 |searchStartsWith | false | Determines if search string is to be identified only at the start of the searched value, otherwise it can occur anywhere in the value. |
-|searchData| [ ]  | SearchData type, supplying the datasource for the search.  This can be dynamically changed e.g. by connecting the input to an Observable. If searchData is not independently supplied, it is automatically build from the vale / label text extracted from the select items|  
+|searchData| [ ]  | SearchData type, supplying the datasource for the search.  This can be dynamically changed e.g. by connecting the input to an Observable. If searchData is not independently supplied, it is automatically built from the value / label text extracted from the select items.|  
 ###
 |@Output|Description  |
 |--|--|

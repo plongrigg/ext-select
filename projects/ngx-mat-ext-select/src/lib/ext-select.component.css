@@ -18,6 +18,7 @@
 .ngx-mat-ext-select-list-scroll {
   padding-top: 0 !important;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .ngx-mat-ext-select-list:focus {
@@ -79,3 +80,5 @@
 .ngx-mat-ext-select-field:not(.mat-form-field-disabled) {
   pointer-events: initial;
 }
+
+

@@ -609,14 +609,15 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
       this.viewport?.checkViewportSize();
     }
 
+    // delay rendering of virtual scroll on first-open to get around a Firefox rendering issue
     setTimeout(() => {
-      // delay rendering of virtual scroll on first-open to get around a Firefox rendering issue
-      // when there are icons involved
       if (!this.firstOpen.value) {
         this.firstOpen.next(true);
         setTimeout(() => this.ensureSelectionVisible());
-      } else { this.ensureSelectionVisible(); }
+      }
+      else { this.ensureSelectionVisible(); }
     });
+
   }
 
   /**

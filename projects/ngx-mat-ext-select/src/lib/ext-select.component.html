@@ -16,7 +16,8 @@
 
     <!--if icon to be displayed in field-->
     <span matPrefix *ngIf="selectDisplayIconInField && component.icon?.id">
-      <mat-icon *ngIf="component.icon?.type === 'svg'" [svgIcon]="component.icon?.id || ''" [style.max-width.px]="35">
+      <mat-icon *ngIf="component.icon?.type === 'svg'" [svgIcon]="component.icon?.id || ''"
+        class="ngx-mat-ext-select-icon" [style.max-width.px]="35">
       </mat-icon>
       <mat-icon *ngIf="component.icon?.type === 'basic'" [style.max-width.px]="35">{{component.icon?.id || ''}}
       </mat-icon>
@@ -28,8 +29,8 @@
   <!--popover for drop down list-->
   <mde-popover #selectPopover="mdePopover" [mdePopoverOverlapTrigger]="true" mdePopoverPositionY="below"
     mdePopoverPositionX="before" [mdePopoverOffsetY]="selectDDOffsetY" [mdePopoverOffsetX]="selectDDOffsetX">
-    <div *ngIf="firstOpen | async" class="ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="5px" fxLayoutAlign="start center"
-      [style.padding-top.px]="selectSearch ? 5 : 0">
+    <div *ngIf="firstOpen | async" class="ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="5px"
+      fxLayoutAlign="start center" [style.padding-top.px]="selectSearch ? 5 : 0">
 
       <!--search box-->
       <ngx-mat-searchbox #search *ngIf="selectSearch" [searchData]="(searchData$ | async) || []"
@@ -45,9 +46,9 @@
         [multiple]="false">
 
         <!--scroller for list - needed for scrollTo on search functionality + dealing with large lists-->
-        <cdk-virtual-scroll-viewport #viewport [itemSize]="selectItemHeight"
-          [minBufferPx]="selectItemHeight*4" [maxBufferPx]="selectItemHeight*8" class="ngx-mat-ext-select-nohorzscroll"
-          [style.width.px]="selectDDWidth" [style.height.px]="viewportHeight">
+        <cdk-virtual-scroll-viewport #viewport [itemSize]="selectItemHeight" [minBufferPx]="selectItemHeight*4"
+          [maxBufferPx]="selectItemHeight*8" class="ngx-mat-ext-select-nohorzscroll" [style.width.px]="selectDDWidth"
+          [style.height.px]="viewportHeight">
 
           <!--each row represents a item-->
           <ng-container *cdkVirtualFor="let item of selectItems$; trackBy:listTrackBy;  templateCacheSize: 0;">
@@ -56,8 +57,8 @@
               [style.height.px]="selectItemHeight">
 
               <!--icon if specified-->
-              <mat-icon class = "ngx-mat-ext-select-icon" matListIcon *ngIf="item.icon && item.icon.type === 'svg'" aria-hidden="true"
-                [svgIcon]="item.icon.id"></mat-icon>
+              <mat-icon class="ngx-mat-ext-select-icon" matListIcon *ngIf="item.icon && item.icon.type === 'svg'"
+                aria-hidden="true" [svgIcon]="item.icon.id"></mat-icon>
               <mat-icon matListIcon *ngIf="item.icon && item.icon.type === 'basic'" aria-hidden="true">{{item.icon.id}}
               </mat-icon>
 
@@ -82,8 +83,8 @@
             [style.height.px]="selectItemHeight">
 
             <!--icon if specified-->
-            <mat-icon class = "ngx-mat-ext-select-icon" matListIcon *ngIf="item.icon && item.icon.type === 'svg'" aria-hidden="true"
-              [svgIcon]="item.icon.id"></mat-icon>
+            <mat-icon class="ngx-mat-ext-select-icon" matListIcon *ngIf="item.icon && item.icon.type === 'svg'"
+              aria-hidden="true" [svgIcon]="item.icon.id"></mat-icon>
             <mat-icon matListIcon *ngIf="item.icon && item.icon.type === 'basic'" aria-hidden="true">{{item.icon.id}}
             </mat-icon>
 
@@ -91,7 +92,7 @@
             <div matLine *ngFor="let label of item.labels; let lrow = index"
               [ngStyle]="getLineStyle(lrow, label.style, label.fontSizePt)">{{label.text}}</div>
 
-              <mat-divider *ngIf="item.labels.length > 1"></mat-divider>
+            <mat-divider *ngIf="item.labels.length > 1"></mat-divider>
           </mat-list-option>
         </ng-container>
       </mat-selection-list>

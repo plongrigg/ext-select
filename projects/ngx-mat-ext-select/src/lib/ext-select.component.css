@@ -81,4 +81,6 @@
   pointer-events: initial;
 }
 
-
+.ngx-mat-ext-select-icon {
+  transform: scale(1);
+}

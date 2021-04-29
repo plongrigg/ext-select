@@ -112,7 +112,13 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   private ddWidth = 0;
 
   @Input()
-  public get selectDDWidth(): number { return this.ddWidth <= 0 ? this.selectFieldWidth : this.ddWidth; }
+  public get selectDDWidth(): number {
+    const width = this.ddWidth <= 0 ? this.selectFieldWidth : this.ddWidth;
+
+    // if there is a search field ensure that the width is at least 250
+    if (this.selectSearch && width < 250) { return 250; }
+    return width;
+  }
   public set selectDDWidth(width: number) { this.ddWidth = width; }
 
   /**

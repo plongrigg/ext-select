@@ -608,11 +608,9 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
 
     // adjust viewport if necessary
     if (this.selectVirtualScroll) {
-      if (isNaN(this.viewport?.getRenderedRange().start ?? 0) || isNaN(this.viewport?.getRenderedRange().end ?? 0)) {
-        this.viewport?.setRenderedRange({ start: 0, end: 0 }); // will adjust
-        this.viewport?.setRenderedContentOffset(0);
+      if (!this.viewport?.getViewportSize()) {
+        this.viewport?.checkViewportSize();
       }
-      this.viewport?.checkViewportSize();
     }
 
     // delay rendering of virtual scroll on first-open to get around a Firefox rendering issue
@@ -623,7 +621,6 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
       }
       else { this.ensureSelectionVisible(); }
     });
-
   }
 
   /**

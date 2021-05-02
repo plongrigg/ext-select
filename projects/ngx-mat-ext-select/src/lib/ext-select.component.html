@@ -42,7 +42,7 @@
       </ngx-mat-searchbox>
 
       <!--virtual scrolled list-->
-      <mat-selection-list *ngIf="selectVirtualScroll" class="ngx-mat-ext-select-list" formControlName="selectList"
+      <mat-selection-list *ngIf="selectVirtualScroll" ngxScrollTo class="ngx-mat-ext-select-list" formControlName="selectList"
         [multiple]="false">
 
         <!--scroller for list - needed for scrollTo on search functionality + dealing with large lists-->
@@ -73,12 +73,12 @@
       </mat-selection-list>
 
       <!--standard scrolled list-->
-      <mat-selection-list *ngIf="!selectVirtualScroll" class="ngx-mat-ext-select-list-scroll" [multiple]=false
+      <mat-selection-list *ngIf="!selectVirtualScroll" ngxScrollTo class="ngx-mat-ext-select-list-scroll" [multiple]=false
         formControlName="selectList" [style.height.px]="viewportHeight" [style.width.px]="selectDDWidth">
 
         <!--each row represents a item-->
         <ng-container *ngFor="let item of selectItems$ | async; trackBy:listTrackBy;">
-          <mat-list-option ngxScrollTo [value]="item.value" (click)="clickOption()"
+          <mat-list-option [value]="item.value" (click)="clickOption()"
             [ngClass]="(searchValueFound(item.value || '') | async)  ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
             [style.height.px]="selectItemHeight">
 

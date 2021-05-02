@@ -50,10 +50,11 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   private searchComponent?: NgxMatSearchboxComponent;
 
   /**
-   * Scrolling directive on the mat-select-list
+   * List of options under conventional (non-virtual)
+   * scrolling
    */
-  @ViewChild(ScrollToDirective)
-  private scroller?: ScrollToDirective;
+  @ViewChildren(ScrollToDirective)
+  private options?: QueryList<ScrollToDirective>;
 
   /**
    * Data source for select - keep both a map and an array for improved performance
@@ -498,7 +499,11 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
 
   /** Scrolls to  list index */
   private scrollTo(listIndex: number): void {
-    this.scroller?.scrollToIndex(listIndex);
+    if (this.selectVirtualScroll) { this.viewport?.scrollToOffset(this.selectItemHeight * listIndex); }
+    else {
+      const scroller = this.options?.get(listIndex);
+      scroller?.scrollTo();
+    }
   }
 
   /**

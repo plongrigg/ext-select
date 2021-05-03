@@ -10,7 +10,7 @@ import { NgxMatSearchboxComponent, SearchData, SearchResults, SearchTerms } from
 import { MdePopoverTrigger } from '@fgrid-ngx/mde';
 import { BehaviorSubject, combineLatest, Observable, of, Subscription } from 'rxjs';
 import { distinctUntilKeyChanged, filter, map, switchMap, take } from 'rxjs/operators';
-import { arrowDropDownImage } from './ext-searchbox.images';
+import { arrowDropDownImage } from './ext-select.images';
 import { ScrollToDirective } from './ext-select-scroll-to.directive';
 import { SelectedItem, SelectItem, SelectItemIcon, SelectItems } from './ext-select.model';
 import { enableControls } from './ext-select.utils';

@@ -11,9 +11,9 @@ import { MdePopoverTrigger } from '@fgrid-ngx/mde';
 import { BehaviorSubject, combineLatest, Observable, of, Subscription } from 'rxjs';
 import { distinctUntilKeyChanged, filter, map, switchMap, take } from 'rxjs/operators';
 import { arrowDropDownImage } from './ext-select.images';
-import { ScrollToDirective } from './ext-select-scroll-to.directive';
 import { SelectedItem, SelectItem, SelectItemIcon, SelectItems } from './ext-select.model';
 import { enableControls } from './ext-select.utils';
+import { ScrollerDirective } from './ext-select-scroller.directive';
 
 /**
  * Implements a select (drop-down) component which has the following capabilities in addition to the standard mat-select
@@ -50,11 +50,10 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   private searchComponent?: NgxMatSearchboxComponent;
 
   /**
-   * List of options under conventional (non-virtual)
-   * scrolling
+   * Scroller directive on either a cdkVirtualViewport or on MatSelectionList
    */
-  @ViewChildren(ScrollToDirective)
-  private options?: QueryList<ScrollToDirective>;
+  @ViewChild(ScrollerDirective)
+  private scroller?: ScrollerDirective;
 
   /**
    * Data source for select - keep both a map and an array for improved performance
@@ -499,11 +498,8 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
 
   /** Scrolls to  list index */
   private scrollTo(listIndex: number): void {
-    if (this.selectVirtualScroll) { this.viewport?.scrollToOffset(this.selectItemHeight * listIndex); }
-    else {
-      const scroller = this.options?.get(listIndex);
-      scroller?.scrollTo();
-    }
+    if (!this.scroller) { return; }
+    this.scroller.scrollTo(listIndex, this.selectItemHeight);
   }
 
   /**

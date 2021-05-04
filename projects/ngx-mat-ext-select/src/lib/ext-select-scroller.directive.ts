@@ -15,7 +15,7 @@ export class ScrollerDirective {
   public scrollTo(index: number, itemHeight: number): void {
     setTimeout(() => {
       if (this.viewport) {
-        this.viewport.scrollToIndex(index);
+        this.viewport.scrollToIndex(index, 'auto');
       } else { this.selectionList.nativeElement.scrollTop = index * itemHeight; }
     });
   }

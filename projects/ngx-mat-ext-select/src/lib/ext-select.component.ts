@@ -325,7 +325,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   /**
    * Tracks open / close status of popup
    */
-  private popupOpen = false;
+  public popupOpen = false;
 
   constructor(
     private iconRegistry: MatIconRegistry,
@@ -600,23 +600,32 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * Popup opened
    */
   public opened(): void {
-    this.popupOpen = true;
+    if (this.firstOpen.value) {
+      this.checkViewportSize();
+      this.ensureSelectionVisible();
+      this.popupOpen = true;
+    } else {
+      // delay rendering of virtual scroll on first-open to get around a Firefox rendering issue
+      setTimeout(() => {
+        this.firstOpen.next(true);
+        setTimeout(() => {
+          this.checkViewportSize();
+          this.ensureSelectionVisible();
+          this.popupOpen = true;
+        });
+      });
+    }
+  }
 
-    // adjust viewport if necessary
+  /**
+   * Adjusts size of virtual scrolling viewport if necessary
+   */
+  private checkViewportSize(): void {
     if (this.selectVirtualScroll) {
       if (!this.viewport?.getViewportSize()) {
         this.viewport?.checkViewportSize();
       }
     }
-
-    // delay rendering of virtual scroll on first-open to get around a Firefox rendering issue
-    setTimeout(() => {
-      if (!this.firstOpen.value) {
-        this.firstOpen.next(true);
-        setTimeout(() => this.ensureSelectionVisible());
-      }
-      else { this.ensureSelectionVisible(); }
-    });
   }
 
   /**

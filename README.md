@@ -136,7 +136,7 @@ In addition the following package(s) will be automatically installed if not alre
 |selectFieldAppearance|outline|These correspond the the Angular Material appearances, 'outline', 'standard', 'fill' or 'legacy' |
 |selectFieldSize|small|Options are 'small' or 'default'. If 'small' then the field has a font of 9pt and the margins, padding etc. are reduced so that the field can comfortably fit on a toolbar. If default, will use the standard sizing mechanism for Material components, where the font size is basically inherited from the parent component, and the margins, padding etc. are calculated accordingly.   |
 |selectDDOffsetY|selectFieldSize = 'small' 15 else 20|Determines the vertical offset of the drop-down panel relative to the top of the select field|
-|selectDDOffsetX|0|Determines the vertical offset of the drop-down panel relative to the left of the select field|
+|selectDDOffsetX|0|Determines the horizontal offset of the drop-down panel relative to the left of the select field|
 |selectVirtualScroll|true|Determines if virtual scrolling should be used for list.  Virtual scrolling is more efficient in terms of DOM usage for large lists, but scrolling might not be as smooth for smaller lists - repainting is slower. |
 |selectSearch|true|Determines whether the searchbox is included on the drop-down panel.|
 |searchExtended | true | Determines if options for extended search are available i.e. startsWith, caseSensitive and range. |

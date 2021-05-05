@@ -10,10 +10,10 @@ import { NgxMatSearchboxComponent, SearchData, SearchResults, SearchTerms } from
 import { MdePopoverTrigger } from '@fgrid-ngx/mde';
 import { BehaviorSubject, combineLatest, Observable, of, Subscription } from 'rxjs';
 import { distinctUntilKeyChanged, filter, map, switchMap, take } from 'rxjs/operators';
-import { arrowDropDownImage } from './ext-searchbox.images';
-import { ScrollToDirective } from './ext-select-scroll-to.directive';
+import { arrowDropDownImage } from './ext-select.images';
 import { SelectedItem, SelectItem, SelectItemIcon, SelectItems } from './ext-select.model';
 import { enableControls } from './ext-select.utils';
+import { ScrollerDirective } from './ext-select-scroller.directive';
 
 /**
  * Implements a select (drop-down) component which has the following capabilities in addition to the standard mat-select
@@ -50,34 +50,34 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   private searchComponent?: NgxMatSearchboxComponent;
 
   /**
-   * List of options under conventional (non-virtual)
-   * scrolling
+   * Scroller directive on either a cdkVirtualViewport or on MatSelectionList
    */
-  @ViewChildren(ScrollToDirective)
-  private options?: QueryList<ScrollToDirective>;
+  @ViewChild(ScrollerDirective)
+  private scroller?: ScrollerDirective;
 
   /**
    * Data source for select - keep both a map and an array for improved performance
    */
-  private selectItemsSource: BehaviorSubject<SelectItems> = new BehaviorSubject(new Map());
+  private selectItemsSource: SelectItems = new Map();
 
   private selectItemsArray: BehaviorSubject<SelectItem[]> = new BehaviorSubject([] as SelectItem[]);
 
   public selectItems$: Observable<SelectItem[]> = of([]);
 
   @Input()
-  public get selectItems(): SelectItems | null | undefined { return this.selectItemsSource.value; }
+  public get selectItems(): SelectItems | null | undefined { return this.selectItemsSource; }
   public set selectItems(selectItems: SelectItems | null | undefined) {
     if (!selectItems) {
-      this.selectItemsSource.next(new Map());
+      this.selectItemsSource = new Map();
       this.selectItemsArray.next([]);
     }
     else {
       // include the key value in the SelectItem object in case not there
-      Array.from(selectItems.entries()).forEach(([key, selectItem]) => {
+      Array.from(selectItems.entries()).forEach(([key, selectItem], index) => {
         selectItem.value = key;
+        selectItem.index = index;
       });
-      this.selectItemsSource.next(selectItems);
+      this.selectItemsSource = selectItems;
       this.selectItemsArray.next(this.selectItemsAsArray(selectItems));
     }
     this.setSelectFieldEnabledState();
@@ -85,9 +85,9 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     // determine if icon included in any display and if not set the firstOpen to true
     let icons = false;
     if (selectItems) {
-      icons = Array.from(selectItems.values()).some(selectItem => !!selectItem.icon);
+      icons = this.selectItemsArray.value.some(selectItem => !!selectItem.icon);
     }
-    if (!icons && !this.firstOpen.value) { this.firstOpen.next(true); }
+    if (!icons && this.popupStatus.value !== 'start') { this.popupStatus.next('opening'); }
   }
 
   /**
@@ -314,19 +314,15 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
 
   /**
-   * Tracks when popup if opened for the first time
+   * Tracks status of popup
    */
-  public firstOpen: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public popupStatus: BehaviorSubject<'start' | 'opening' | 'open' | 'closed'> =
+    new BehaviorSubject('start' as 'start' | 'opening' | 'open' | 'closed');
 
   /**
    * Tracks icon of currently selected item
    */
   public currentIcon: BehaviorSubject<SelectItemIcon> = new BehaviorSubject<SelectItemIcon>({ type: 'svg', id: '' });
-
-  /**
-   * Tracks open / close status of popup
-   */
-  private popupOpen = false;
 
   constructor(
     private iconRegistry: MatIconRegistry,
@@ -430,8 +426,8 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     if (!selectList) { return; }
     const changes = value && this.selectItems?.get(value) ? [value] : [];
     if (value === this.getSelectedValue()) { return; }
-    this.ensureSelectionVisible();
     selectList.setValue(changes, { emitEvent: true });
+    this.ensureSelectionVisible();
   }
 
   /**
@@ -499,11 +495,8 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
 
   /** Scrolls to  list index */
   private scrollTo(listIndex: number): void {
-    if (this.selectVirtualScroll) { this.viewport?.scrollToOffset(this.selectItemHeight * listIndex); }
-    else {
-      const scroller = this.options?.get(listIndex);
-      scroller?.scrollTo();
-    }
+    if (!this.scroller) { return; }
+    this.scroller.scrollTo(listIndex, this.selectItemHeight);
   }
 
   /**
@@ -546,7 +539,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * Detect click on an option, and if popup is still open, close it
    */
   public clickOption(): void {
-    if (this.popupOpen) { this.trigger?.closePopover(); }
+    if (this.popupStatus.getValue() === 'open') { this.trigger?.closePopover(); }
   }
 
   /**
@@ -604,23 +597,36 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * Popup opened
    */
   public opened(): void {
-    this.popupOpen = true;
+    const scrollToVisible = (this.selectItems?.get(this.getSelectedValue() || '')?.index ?? 0) >= this.selectNoItemsVisible;
 
-    // adjust viewport if necessary
+    if (this.popupStatus.getValue() !== 'start') {
+      setTimeout(() => {
+        this.checkViewportSize();
+        if (scrollToVisible) { this.ensureSelectionVisible(); }
+        this.popupStatus.next('open');
+      });
+    } else {
+      // delay rendering of virtual scroll on first-open to get around a Firefox rendering issue
+      setTimeout(() => {
+        this.popupStatus.next('opening'); // allows dom to be populated
+        setTimeout(() => {
+          this.checkViewportSize();
+          if (scrollToVisible) { this.ensureSelectionVisible(); }
+          this.popupStatus.next('open'); // list becomes visible
+        });
+      });
+    }
+  }
+
+  /**
+   * Adjusts size of virtual scrolling viewport if necessary
+   */
+  private checkViewportSize(): void {
     if (this.selectVirtualScroll) {
       if (!this.viewport?.getViewportSize()) {
         this.viewport?.checkViewportSize();
       }
     }
-
-    // delay rendering of virtual scroll on first-open to get around a Firefox rendering issue
-    setTimeout(() => {
-      if (!this.firstOpen.value) {
-        this.firstOpen.next(true);
-        setTimeout(() => this.ensureSelectionVisible());
-      }
-      else { this.ensureSelectionVisible(); }
-    });
   }
 
   /**
@@ -628,7 +634,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    */
   public closed(): void {
     // reset the search component
-    this.popupOpen = false;
+    this.popupStatus.next('closed');
     if (this.selectSearch) {
       this.searchResults.next([]);
       this.searchComponent?.clearSearchField();
@@ -686,7 +692,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
     this.searchResults.complete();
-    this.selectItemsSource.complete();
     this.selectItemsArray.complete();
+    this.popupStatus.complete();
   }
 }

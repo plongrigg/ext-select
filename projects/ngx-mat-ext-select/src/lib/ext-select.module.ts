@@ -11,12 +11,12 @@ import { MatListModule } from '@angular/material/list';
 import { NgxMatSearchboxModule } from '@fgrid-ngx/mat-searchbox';
 import { MdePopoverModule } from '@fgrid-ngx/mde';
 import { NgxMatExtSelectComponent } from './ext-select.component';
-import { ScrollToDirective } from './ext-select-scroll-to.directive';
+import { ScrollerDirective } from './ext-select-scroller.directive';
 
 @NgModule({
   declarations: [
     NgxMatExtSelectComponent,
-    ScrollToDirective
+    ScrollerDirective
   ],
   imports: [
     CommonModule,

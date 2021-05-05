@@ -27,9 +27,9 @@
   </mat-form-field>
 
   <!--popover for drop down list-->
-  <mde-popover #selectPopover="mdePopover" [mdePopoverOverlapTrigger]="true" mdePopoverPositionY="below"
+  <mde-popover #selectPopover="mdePopover" [mdePopoverOverlapTrigger]="true" mdePopoverPositionY="below" [mdeFocusTrapAutoCaptureEnabled]="false"
     mdePopoverPositionX="before" [mdePopoverOffsetY]="selectDDOffsetY" [mdePopoverOffsetX]="selectDDOffsetX">
-    <div *ngIf="firstOpen | async" class="ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="5px"
+    <div *ngIf="(popupStatus | async) !== 'start'" class="ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="5px"
       fxLayoutAlign="start center" [style.padding-top.px]="selectSearch ? 5 : 0">
 
       <!--search box-->
@@ -43,15 +43,15 @@
 
       <!--virtual scrolled list-->
       <mat-selection-list *ngIf="selectVirtualScroll" class="ngx-mat-ext-select-list" formControlName="selectList"
-        [multiple]="false">
+        [multiple]="false" [style.visibility]="(popupStatus | async) === 'open' ? 'visible' : 'hidden'">
 
         <!--scroller for list - needed for scrollTo on search functionality + dealing with large lists-->
-        <cdk-virtual-scroll-viewport #viewport [itemSize]="selectItemHeight" [minBufferPx]="selectItemHeight*4"
-          [maxBufferPx]="selectItemHeight*8" class="ngx-mat-ext-select-nohorzscroll" [style.width.px]="selectDDWidth"
-          [style.height.px]="viewportHeight">
+        <cdk-virtual-scroll-viewport ngxScroller #viewport [itemSize]="selectItemHeight"
+          [minBufferPx]="selectItemHeight*4" [maxBufferPx]="selectItemHeight*8" class="ngx-mat-ext-select-nohorzscroll"
+          [style.width.px]="selectDDWidth" [style.height.px]="viewportHeight">
 
           <!--each row represents a item-->
-          <ng-container *cdkVirtualFor="let item of selectItems$; trackBy:listTrackBy;  templateCacheSize: 0;">
+          <ng-container *cdkVirtualFor="let item of selectItems$ | async; trackBy:listTrackBy;  templateCacheSize: 0;">
             <mat-list-option [value]=item.value (click)="clickOption()"
               [ngClass]="(searchValueFound(item.value || '') | async)  ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
               [style.height.px]="selectItemHeight">
@@ -73,12 +73,13 @@
       </mat-selection-list>
 
       <!--standard scrolled list-->
-      <mat-selection-list *ngIf="!selectVirtualScroll" class="ngx-mat-ext-select-list-scroll" [multiple]=false
-        formControlName="selectList" [style.height.px]="viewportHeight" [style.width.px]="selectDDWidth">
+      <mat-selection-list *ngIf="!selectVirtualScroll" ngxScroller class="ngx-mat-ext-select-list-scroll"
+        [multiple]=false formControlName="selectList" [style.height.px]="viewportHeight"
+        [style.width.px]="selectDDWidth" [style.visibility]="(popupStatus | async) === 'open' ? 'visible' : 'hidden'">
 
         <!--each row represents a item-->
         <ng-container *ngFor="let item of selectItems$ | async; trackBy:listTrackBy;">
-          <mat-list-option ngxScrollTo [value]="item.value" (click)="clickOption()"
+          <mat-list-option [value]="item.value" (click)="clickOption()"
             [ngClass]="(searchValueFound(item.value || '') | async)  ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
             [style.height.px]="selectItemHeight">
 

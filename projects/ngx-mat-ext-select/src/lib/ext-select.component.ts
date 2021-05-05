@@ -73,8 +73,9 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     }
     else {
       // include the key value in the SelectItem object in case not there
-      Array.from(selectItems.entries()).forEach(([key, selectItem]) => {
+      Array.from(selectItems.entries()).forEach(([key, selectItem], index) => {
         selectItem.value = key;
+        selectItem.index = index;
       });
       this.selectItemsSource = selectItems;
       this.selectItemsArray.next(this.selectItemsAsArray(selectItems));
@@ -84,7 +85,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     // determine if icon included in any display and if not set the firstOpen to true
     let icons = false;
     if (selectItems) {
-      icons = Array.from(selectItems.values()).some(selectItem => !!selectItem.icon);
+      icons = this.selectItemsArray.value.some(selectItem => !!selectItem.icon);
     }
     if (!icons && this.popupStatus.value !== 'start') { this.popupStatus.next('opening'); }
   }
@@ -596,10 +597,12 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * Popup opened
    */
   public opened(): void {
+    const scrollToVisible = (this.selectItems?.get(this.getSelectedValue() || '')?.index ?? 0) >= this.selectNoItemsVisible;
+
     if (this.popupStatus.getValue() !== 'start') {
       setTimeout(() => {
         this.checkViewportSize();
-        this.ensureSelectionVisible();
+        if (scrollToVisible) { this.ensureSelectionVisible(); }
         this.popupStatus.next('open');
       });
     } else {
@@ -608,7 +611,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
         this.popupStatus.next('opening'); // allows dom to be populated
         setTimeout(() => {
           this.checkViewportSize();
-          this.ensureSelectionVisible();
+          if (scrollToVisible) { this.ensureSelectionVisible(); }
           this.popupStatus.next('open'); // list becomes visible
         });
       });

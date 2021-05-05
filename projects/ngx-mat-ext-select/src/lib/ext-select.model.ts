@@ -28,6 +28,7 @@ export type SelectItemIcon = {
  */
 export type SelectItem = {
   value?: string | number;   // no need to populate this field for input, as it is the key of the map
+  index?: number;            // no need to populate this field for input
   icon?: SelectItemIcon;
   labels: SelectItemLabel[];
   display: string;         // single-line representation of item for field display

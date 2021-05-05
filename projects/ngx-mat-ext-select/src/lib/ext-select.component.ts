@@ -58,17 +58,17 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   /**
    * Data source for select - keep both a map and an array for improved performance
    */
-  private selectItemsSource: BehaviorSubject<SelectItems> = new BehaviorSubject(new Map());
+  private selectItemsSource: SelectItems = new Map();
 
   private selectItemsArray: BehaviorSubject<SelectItem[]> = new BehaviorSubject([] as SelectItem[]);
 
   public selectItems$: Observable<SelectItem[]> = of([]);
 
   @Input()
-  public get selectItems(): SelectItems | null | undefined { return this.selectItemsSource.value; }
+  public get selectItems(): SelectItems | null | undefined { return this.selectItemsSource; }
   public set selectItems(selectItems: SelectItems | null | undefined) {
     if (!selectItems) {
-      this.selectItemsSource.next(new Map());
+      this.selectItemsSource = new Map();
       this.selectItemsArray.next([]);
     }
     else {
@@ -76,7 +76,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
       Array.from(selectItems.entries()).forEach(([key, selectItem]) => {
         selectItem.value = key;
       });
-      this.selectItemsSource.next(selectItems);
+      this.selectItemsSource = selectItems;
       this.selectItemsArray.next(this.selectItemsAsArray(selectItems));
     }
     this.setSelectFieldEnabledState();
@@ -689,7 +689,6 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
     this.searchResults.complete();
-    this.selectItemsSource.complete();
     this.selectItemsArray.complete();
     this.popupStatus.complete();
   }

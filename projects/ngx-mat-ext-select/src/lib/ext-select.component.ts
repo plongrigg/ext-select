@@ -86,7 +86,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     if (selectItems) {
       icons = Array.from(selectItems.values()).some(selectItem => !!selectItem.icon);
     }
-    if (!icons && !this.firstOpen.value) { this.firstOpen.next(true); }
+    if (!icons && this.popupStatus.value !== 'start') { this.popupStatus.next('opening'); }
   }
 
   /**
@@ -313,19 +313,15 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription = new Subscription();
 
   /**
-   * Tracks when popup if opened for the first time
+   * Tracks status of popup
    */
-  public firstOpen: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public popupStatus: BehaviorSubject<'start' | 'opening' | 'open' | 'closed'> =
+    new BehaviorSubject('start' as 'start' | 'opening' | 'open' | 'closed');
 
   /**
    * Tracks icon of currently selected item
    */
   public currentIcon: BehaviorSubject<SelectItemIcon> = new BehaviorSubject<SelectItemIcon>({ type: 'svg', id: '' });
-
-  /**
-   * Tracks open / close status of popup
-   */
-  public popupOpen = false;
 
   constructor(
     private iconRegistry: MatIconRegistry,
@@ -429,8 +425,8 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     if (!selectList) { return; }
     const changes = value && this.selectItems?.get(value) ? [value] : [];
     if (value === this.getSelectedValue()) { return; }
-    this.ensureSelectionVisible();
     selectList.setValue(changes, { emitEvent: true });
+    this.ensureSelectionVisible();
   }
 
   /**
@@ -542,7 +538,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * Detect click on an option, and if popup is still open, close it
    */
   public clickOption(): void {
-    if (this.popupOpen) { this.trigger?.closePopover(); }
+    if (this.popupStatus.getValue() === 'open') { this.trigger?.closePopover(); }
   }
 
   /**
@@ -600,18 +596,20 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * Popup opened
    */
   public opened(): void {
-    if (this.firstOpen.value) {
-      this.checkViewportSize();
-      this.ensureSelectionVisible();
-      this.popupOpen = true;
+    if (this.popupStatus.getValue() !== 'start') {
+      setTimeout(() => {
+        this.checkViewportSize();
+        this.ensureSelectionVisible();
+        this.popupStatus.next('open');
+      });
     } else {
       // delay rendering of virtual scroll on first-open to get around a Firefox rendering issue
       setTimeout(() => {
-        this.firstOpen.next(true);
+        this.popupStatus.next('opening'); // allows dom to be populated
         setTimeout(() => {
           this.checkViewportSize();
           this.ensureSelectionVisible();
-          this.popupOpen = true;
+          this.popupStatus.next('open'); // list becomes visible
         });
       });
     }
@@ -633,7 +631,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    */
   public closed(): void {
     // reset the search component
-    this.popupOpen = false;
+    this.popupStatus.next('closed');
     if (this.selectSearch) {
       this.searchResults.next([]);
       this.searchComponent?.clearSearchField();
@@ -693,5 +691,6 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     this.searchResults.complete();
     this.selectItemsSource.complete();
     this.selectItemsArray.complete();
+    this.popupStatus.complete();
   }
 }

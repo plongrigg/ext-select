@@ -13,10 +13,8 @@ export class ScrollerDirective {
   constructor(private selectionList: ElementRef, @Optional() private viewport: CdkVirtualScrollViewport) { }
 
   public scrollTo(index: number, itemHeight: number): void {
-    setTimeout(() => {
-      if (this.viewport) {
-        this.viewport.scrollToIndex(index, 'auto');
-      } else { this.selectionList.nativeElement.scrollTop = index * itemHeight; }
-    });
+    if (this.viewport) {
+      this.viewport.scrollToIndex(index, 'auto');
+    } else { this.selectionList.nativeElement.scrollTop = index * itemHeight; }
   }
 }

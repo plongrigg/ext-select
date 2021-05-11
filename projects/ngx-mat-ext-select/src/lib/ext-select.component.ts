@@ -9,8 +9,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { NgxMatSearchboxComponent, SearchData, SearchResults, SearchTerms } from '@fgrid-ngx/mat-searchbox';
 import { MdePopoverTrigger } from '@fgrid-ngx/mde';
 import { BehaviorSubject, combineLatest, Observable, of, Subscription } from 'rxjs';
-import { distinctUntilKeyChanged, filter, map, switchMap, take } from 'rxjs/operators';
-import { arrowDropDownImage } from './ext-select.images';
+import { catchError, distinctUntilKeyChanged, filter, map, switchMap, take } from 'rxjs/operators';
+import { arrowDropDownImage, imagePlaceholder } from './ext-select.images';
 import { SelectedItem, SelectItem, SelectItemIcon, SelectItems } from './ext-select.model';
 import { enableControls } from './ext-select.utils';
 import { ScrollerDirective } from './ext-select-scroller.directive';
@@ -77,8 +77,16 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
         selectItem.value = key;
         selectItem.index = index;
       });
+
+      // extract array
       this.selectItemsSource = selectItems;
-      this.selectItemsArray.next(this.selectItemsAsArray(selectItems));
+      const items = this.selectItemsAsArray(selectItems);
+
+      // register / load icons included in items (if any)
+      this.loadImages(items);
+
+      // set in BehaviorSubject
+      this.selectItemsArray.next(items);
     }
     this.setSelectFieldEnabledState();
 
@@ -329,7 +337,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer) {
 
     // load drop-down arrow image into registry
-    this.loadImage('ngx-mat-ext-select-ddarrow', arrowDropDownImage);
+    this.loadImageLiteral('ngx-mat-ext-select-ddarrow', arrowDropDownImage);
 
     // current item list, which can change dynamically, and if search filer is on will be limited
     // by the search criteria
@@ -645,14 +653,42 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * Loads an SVG image to the MatIconRegistry from a string literal,
    * representing an svg
    */
-  private loadImage(
-    iconName: string,
-    svg: string
-  ): void {
+  private loadImageLiteral(iconId: string, svg: string): void {
     this.iconRegistry.addSvgIconLiteral(
-      iconName,
+      iconId,
       this.sanitizer.bypassSecurityTrustHtml(svg)
     );
+  }
+
+  /**
+   * Registers and preloads SVG image from url
+   */
+  private loadImage(iconId: string, url: string): void {
+    // register the image
+    const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    this.iconRegistry.addSvgIcon(iconId, safeUrl);
+
+    // preload the image
+    this.iconRegistry.getSvgIconFromUrl(safeUrl).pipe(take(1), catchError(e => {
+      this.loadImageLiteral(iconId, imagePlaceholder);
+      return of();
+    })).subscribe();
+  }
+
+  /**
+   * Registers and preloads images in a list of items
+   */
+  private loadImages(items: SelectItem[]): void {
+    Array.from(items
+      .filter(selectItem => selectItem.icon && selectItem.icon.type === 'svg' && selectItem.icon.url)
+      .map(selectItem => [selectItem.icon?.id ?? '', selectItem.icon?.url ?? ''])
+      .reduce((m, [id, url]) => {
+        if (m.has(id)) { return m; }
+        m.set(id, url);
+        return m;
+      }, new Map<string, string>())
+      .entries())
+      .forEach(([id, url]) => this.loadImage(id, url));
   }
 
   /**

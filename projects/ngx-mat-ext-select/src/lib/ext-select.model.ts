@@ -20,6 +20,8 @@ export type SelectItemLabel = {
  */
 export type SelectItemIcon = {
   type: 'basic' | 'svg', id: string,  // if an svg it should be registered in the icon registry, basic is a css based icon
+  url?: string,                       // if provided, the svg will be registered and preloaded,
+                                      // otherwise the host application is assumed to have registered the svg
   fieldDisplayIconGapPx?: number      // gap between icon and display in the field, needed if icon does not include a whitespace border
 };
 

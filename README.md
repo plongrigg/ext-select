@@ -115,7 +115,7 @@ In addition the following package(s) will be automatically installed if not alre
      ```html
      <ngx-mat-ext-select  
        [selectItems]="selectItems" 
-       (itemSelected)="itemSelected($event)"">
+       (itemSelected)="itemSelected($event)">
      </ngx-mat-ext-select>
      ```
  At a minimum, supply an input for the list of items to be selected,  and a function to respond to the results of a selection.  There are a number of other inputs that can be used to control the behavior and appearance of the component.  The select data supplied is in the form of a SelectItems type.  Please refer to the exported definition of this type.   The (itemSelected) output function passes a SelectedItem type in its parameter, which can then be used to perform whatever action is required.  

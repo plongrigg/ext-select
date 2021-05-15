@@ -84,3 +84,7 @@
 .ngx-mat-ext-select-icon {
   transform: scale(1);
 }
+
+.ngx-mat-ext-select-emoji {
+  font-family: inherit;
+}

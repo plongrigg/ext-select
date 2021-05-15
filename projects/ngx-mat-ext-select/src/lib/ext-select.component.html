@@ -21,14 +21,18 @@
       </mat-icon>
       <mat-icon *ngIf="component.icon?.type === 'basic'" [style.max-width.px]="35">{{component.icon?.id || ''}}
       </mat-icon>
+      <mat-icon *ngIf="component.icon?.type === 'emoji'" [style.max-width.px]="35" class="ngx-mat-ext-select-emoji">
+        {{component.icon?.id || ''}}
+      </mat-icon>
       <span *ngIf="component.icon?.fieldDisplayIconGapPx"
         [fxFlex]="(component.icon?.fieldDisplayIconGapPx || 0)+'px'"></span>
     </span>
   </mat-form-field>
 
   <!--popover for drop down list-->
-  <mde-popover #selectPopover="mdePopover" [mdePopoverOverlapTrigger]="true" mdePopoverPositionY="below" [mdeFocusTrapAutoCaptureEnabled]="false"
-    mdePopoverPositionX="before" [mdePopoverOffsetY]="selectDDOffsetY" [mdePopoverOffsetX]="selectDDOffsetX">
+  <mde-popover #selectPopover="mdePopover" [mdePopoverOverlapTrigger]="true" mdePopoverPositionY="below"
+    [mdeFocusTrapAutoCaptureEnabled]="false" mdePopoverPositionX="before" [mdePopoverOffsetY]="selectDDOffsetY"
+    [mdePopoverOffsetX]="selectDDOffsetX">
     <div *ngIf="(popupStatus | async) !== 'start'" class="ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="5px"
       fxLayoutAlign="start center" [style.padding-top.px]="selectSearch ? 5 : 0">
 
@@ -61,6 +65,9 @@
                 aria-hidden="true" [svgIcon]="item.icon.id"></mat-icon>
               <mat-icon matListIcon *ngIf="item.icon && item.icon.type === 'basic'" aria-hidden="true">{{item.icon.id}}
               </mat-icon>
+              <mat-icon class="ngx-mat-ext-select-emoji" matListIcon *ngIf="item.icon && item.icon.type === 'emoji'"
+                aria-hidden="true">{{item.icon.id}}
+              </mat-icon>
 
               <!--item representation multi-line labels-->
               <div matLine *ngFor="let label of item.labels; let lrow = index"
@@ -87,6 +94,9 @@
             <mat-icon class="ngx-mat-ext-select-icon" matListIcon *ngIf="item.icon && item.icon.type === 'svg'"
               aria-hidden="true" [svgIcon]="item.icon.id"></mat-icon>
             <mat-icon matListIcon *ngIf="item.icon && item.icon.type === 'basic'" aria-hidden="true">{{item.icon.id}}
+            </mat-icon>
+            <mat-icon class="ngx-mat-ext-select-emoji" matListIcon *ngIf="item.icon && item.icon.type === 'emoji'"
+              aria-hidden="true">{{item.icon.id}}
             </mat-icon>
 
             <!--item representation multi-line labels-->

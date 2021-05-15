@@ -19,8 +19,11 @@ export type SelectItemLabel = {
  * Icon to prefix item display
  */
 export type SelectItemIcon = {
-  type: 'basic' | 'svg', id: string,  // if an svg it should be registered in the icon registry, basic is a css based icon
-  url?: string,                       // if provided, the svg will be registered and preloaded,
+  id: string,                         // either an id identifying the svg or the css based icon, or if emoji the unicode character(s)
+  type: 'basic' | 'svg' | 'emoji',    // if an svg it should be registered in the icon registry,
+                                      // basic is a css based icon (usually an angular material icon),
+                                      // emoji is a unicode character(s)
+  url?: string,                       // if provided, the svg will be automatically registered and preloaded,
                                       // otherwise the host application is assumed to have registered the svg
   fieldDisplayIconGapPx?: number      // gap between icon and display in the field, needed if icon does not include a whitespace border
 };

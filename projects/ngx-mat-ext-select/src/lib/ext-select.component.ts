@@ -676,7 +676,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Registers and preloads images in a list of items
+   * Registers and preloads SVG images contained in a list of items, if url is provided
    */
   private loadImages(items: SelectItem[]): void {
     Array.from(items

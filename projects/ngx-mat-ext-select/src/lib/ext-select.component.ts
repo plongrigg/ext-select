@@ -445,10 +445,13 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     const selectField = this.selectForm.get('selectField');
     if (!selectField) { return; }
     const currentValue = selectField.value;
-    if (currentValue === selectedItem?.display.trimRight() || null) { return; }
-    this.selectForm.patchValue({ selectField: selectedItem?.display.trimRight() || null }, { emitEvent: false });
 
-    // update currently selected item
+     // update currently selected item text
+    if (currentValue !== selectedItem?.display.trimRight() || null) {
+      this.selectForm.patchValue({ selectField: selectedItem?.display.trimRight() || null }, { emitEvent: false });
+    }
+
+    // update currently selected item icon
     this.trackCurrentIcon(selectedItem?.value);
   }
 

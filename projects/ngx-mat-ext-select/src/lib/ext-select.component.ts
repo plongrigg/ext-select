@@ -90,12 +90,8 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     }
     this.setSelectFieldEnabledState();
 
-    // determine if icon included in any display and if not set the firstOpen to true
-    let icons = false;
-    if (selectItems) {
-      icons = this.selectItemsArray.value.some(selectItem => !!selectItem.icon);
-    }
-    if (!icons && this.popupStatus.value !== 'start') { this.popupStatus.next('opening'); }
+    // set status to start on reload of the component, so that DOM is rebuilt
+    if (this.popupStatus.value !== 'start') { this.popupStatus.next('start'); }
   }
 
   /**
@@ -489,6 +485,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    * always disabled.  Otherwise determined by input selectDisabled
    */
   private setSelectFieldEnabledState(): void {
+    this.trigger?.closePopover();
     enableControls(this.selectForm, !this.selectDisabled);
   }
 

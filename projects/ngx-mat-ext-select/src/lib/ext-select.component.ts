@@ -1,19 +1,19 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import {
-  ChangeDetectionStrategy, Component, EventEmitter, Input,
-  OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren, ViewEncapsulation
+  ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input,
+  OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation
 } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NgxMatSearchboxComponent, SearchData, SearchResults, SearchTerms } from '@fgrid-ngx/mat-searchbox';
 import { MdePopoverTrigger } from '@fgrid-ngx/mde';
 import { BehaviorSubject, combineLatest, Observable, of, Subscription } from 'rxjs';
 import { catchError, distinctUntilKeyChanged, filter, map, switchMap, take } from 'rxjs/operators';
+import { ScrollerDirective } from './ext-select-scroller.directive';
 import { arrowDropDownImage, imagePlaceholder } from './ext-select.images';
 import { SelectedItem, SelectItem, SelectItemIcon, SelectItems } from './ext-select.model';
 import { enableControls } from './ext-select.utils';
-import { ScrollerDirective } from './ext-select-scroller.directive';
 
 /**
  * Implements a select (drop-down) component which has the following capabilities in addition to the standard mat-select
@@ -26,10 +26,17 @@ import { ScrollerDirective } from './ext-select-scroller.directive';
   exportAs: 'ngxMatExtSelect',
   templateUrl: './ext-select.component.html',
   styleUrls: ['./ext-select.component.css'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      multi: true,
+      useExisting: forwardRef(() => NgxMatExtSelectComponent),
+    }
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None
 })
-export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
+export class NgxMatExtSelectComponent implements OnInit, OnDestroy, ControlValueAccessor {
 
   /**
    * Reference to virtual scrolling viewport for list
@@ -328,6 +335,11 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    */
   public currentIcon: BehaviorSubject<SelectItemIcon> = new BehaviorSubject<SelectItemIcon>({ type: 'svg', id: '' });
 
+  /**
+   * Determine whether the control has been touched for the first time
+   */
+  private touched = false;
+
   constructor(
     private iconRegistry: MatIconRegistry,
     private sanitizer: DomSanitizer) {
@@ -532,6 +544,9 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
     // emit change
     this.itemSelected.emit(selectedItem);
 
+    // control value accessor
+    this.onChange(selectedItem.value);
+
     // close the popup
     this.trigger?.closePopover();
   }
@@ -720,6 +735,37 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy {
    */
   private dataToListIndex(dataIndex: number): Observable<number> {
     return this.dataIndexToValue(dataIndex).pipe(switchMap(value => this.valueToListIndex(value)));
+  }
+
+  /** Implementation for ControlValueAccessor */
+  private onChange = (value: string | number | undefined) => { };
+
+  private onTouched = () => { };
+
+  public writeValue(value: string | number | undefined): void {
+     this.setSelectedValue(value);
+  }
+
+  public registerOnChange(fn: (value: number | string | undefined) => void): void {
+    this.onChange = (value: number | string | undefined) => {
+      fn(value);
+      this.markAsTouched();
+    };
+  }
+
+  public registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  public setDisabledState(disabled: boolean): void {
+     this.selectDisabled = disabled;
+  }
+
+  private markAsTouched(): void {
+    if (!this.touched) {
+      this.onTouched();
+      this.touched = true;
+    }
   }
 
   /**

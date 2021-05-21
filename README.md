@@ -118,7 +118,7 @@ In addition the following package(s) will be automatically installed if not alre
        (itemSelected)="itemSelected($event)">
      </ngx-mat-ext-select>
      ```
- At a minimum, supply an input for the list of items to be selected,  and a function to respond to the results of a selection.  There are a number of other inputs that can be used to control the behavior and appearance of the component.  The select data supplied is in the form of a SelectItems type.  Please refer to the exported definition of this type.   The (itemSelected) output function passes a SelectedItem type in its parameter, which can then be used to perform whatever action is required.  
+ There are a number of inputs which can be used to control the behavior and appearance of the component. At a minimum, supply an input for the list of items to be selected.  The select data supplied is in the form of a SelectItems type.  Please refer to the exported definition of this type. If not defined as a control within an Angular form, also supply a function to respond to the results of a selection change. The (itemSelected) output function passes a SelectedItem type in its parameter, which can then be used to perform the required action for a selection change. This component also implements the ControlValueAccessor interface, which means it can be defined as a control in an Angular form (reactive or template). If defined as a FormControl within an reactive Angular form, the selected value change can be obtained by subscribing to the valueChanges observable of the FormGroup or FormControl, rather then relying on the (itemSelected) emission.        
  
 ## API 
 

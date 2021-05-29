@@ -5,7 +5,7 @@
     <img src="https://raw.githubusercontent.com/plongrigg/readme-images/main/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">Angular Material Extended Select</h3>
+  <h3 align="center">Extended Select component for Angular Material</h3>
 
   <p align="center">
     Extended Select component, with searchbox and multi-line items,  based on Angular Material

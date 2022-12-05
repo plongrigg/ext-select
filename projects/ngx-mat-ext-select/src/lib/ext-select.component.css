@@ -2,7 +2,7 @@
   min-width: 75px;
 }
 
-/* extends mat-select-panel -alos include class="mat-select-panel and make sure these attributes override*/
+/* extends mat-select-panel */
 .ngx-mat-ext-select-panel {
   overflow:hidden;
   box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),0px 4px 5px 0px rgba(0, 0, 0, 0.14),0px 1px 10px 0px rgba(0, 0, 0, 0.12);
@@ -40,7 +40,80 @@
   max-width: 100%;
 }
 
+/***small form field styling for Angular Material 15+****/
+.ngx-mat-ext-select-small-input.mat-mdc-form-field.mat-form-field-appearance-outline
+  .mat-mdc-form-field-icon-suffix > .mat-icon {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-right: 0px;
+}
+
+.ngx-mat-ext-select-small-input.mat-mdc-form-field:not(.mat-form-field-appearance-outline)
+  .mat-mdc-form-field-icon-suffix > .mat-icon {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-right: 0px;
+}
+
+.ngx-mat-ext-select-small-input.mat-mdc-form-field:not(.mat-form-field-appearance-outline)
+  .ngx-search-button.mat-mdc-button {
+  height: 48px;
+}
+
 /* small form field - currently for components placed on button ribbon */
+.ngx-mat-ext-select-small-input.mat-mdc-form-field .mat-mdc-form-field-flex {
+  align-items: center;
+  padding-right: 0.1em;
+}
+.ngx-mat-ext-select-small-input.mat-mdc-form-field:not(.mat-form-field-appearance-outline)
+  .mat-mdc-form-field-flex {
+  padding-top: 0em;
+}
+.ngx-mat-ext-select-small-input.mat-mdc-form-field:not(.mat-form-field-appearance-outline)
+  .mat-mdc-form-field-wrapper
+  .mat-mdc-form-field-underline {
+  bottom: 0em;
+}
+.ngx-mat-ext-select-small-input.mat-mdc-form-field .mat-mdc-form-field-infix {
+  padding: 0px 0px 0px 0px;
+  font-size: 9pt;
+  min-height: 24px;
+}
+.ngx-mat-ext-select-small-input.mat-mdc-form-field
+  .mat-mdc-form-field-infix
+  .mat-mdc-select-arrow {
+  margin-top: 6px;
+}
+.ngx-mat-ext-select-small-input.mat-mdc-form-field:not(.mat-mdc-form-field-should-float)
+  .mat-mdc-form-field-label.mat-mdc-form-field-empty {
+  top: 1.5em;
+}
+.ngx-mat-ext-select-small-input.mat-mdc-form-field .mat-mdc-form-field-wrapper {
+  padding-bottom: 0em;
+}
+.ngx-mat-ext-select-small-input.mat-mdc-form-field .mat-mdc-form-field-suffix {
+  top: 0.12em;
+}
+
+.ngx-mat-ext-select-small-input.mat-mdc-form-field
+  .mat-mdc-form-field-subscript-wrapper {
+  max-height: 0px;
+}
+
+.ngx-mat-ext-select-small-input.mat-mdc-form-field
+  .mat-mdc-text-field-wrapper
+  .mat-mdc-floating-label:not(.mdc-floating-label--float-above) {
+  top: 50%;
+}
+
+/**only for non-outline**/
+.ngx-mat-ext-select-small-input.mat-mdc-form-field:not(.mat-form-field-appearance-outline)
+  .mat-mdc-text-field-wrapper
+  .mat-mdc-floating-label.mdc-floating-label--float-above {
+  top: 10px;
+}
+
+/* Material 14 and below small form field */
 .ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-flex {
   align-items: center;
   padding-right: 0.1em;
@@ -77,8 +150,41 @@
   pointer-events: none;
 }
 
+.ngx-mat-ext-select-field.mat-form-field-disabled .mat-mdc-form-field-icon-suffix {
+  pointer-events: none;
+}
+
 .ngx-mat-ext-select-field:not(.mat-form-field-disabled) {
   pointer-events: initial;
+}
+
+.ngx-mat-ext-select-field:not(.mat-form-field-disabled) .mat-mdc-form-field-icon-suffix {
+  pointer-events: initial;
+}
+
+/* icons */
+.ngx-mat-ext-select-small-input.mat-mdc-form-field .ngx-mat-ext-select-icon {
+  padding-left: 5px;
+  max-height: 18px;
+  max-width: 35px;
+}
+
+:not(.ngx-mat-ext-select-small-input).mat-mdc-form-field .ngx-mat-ext-select-icon {
+  padding-left: 15px;
+  max-height: 24px;
+  max-width: 35px;
+}
+
+.ngx-mat-ext-select-small-input.mat-mdc-form-field .ngx-mat-ext-select-emoji {
+  padding-left: 5px;
+  max-width: 35px;
+  font-family: inherit;
+}
+
+:not(.ngx-mat-ext-select-small-input).mat-mdc-form-field .ngx-mat-ext-select-emoji {
+  padding-left: 15px;
+  max-width: 35px;
+  font-family: inherit;
 }
 
 .ngx-mat-ext-select-icon {

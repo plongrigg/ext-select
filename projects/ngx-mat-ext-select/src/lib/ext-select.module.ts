@@ -10,8 +10,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { NgxMatSearchboxModule } from '@fgrid-ngx/mat-searchbox';
 import { MdePopoverModule } from '@fgrid-ngx/mde';
-import { NgxMatExtSelectComponent } from './ext-select.component';
 import { ScrollerDirective } from './ext-select-scroller.directive';
+import { NgxMatExtSelectComponent } from './ext-select.component';
 
 @NgModule({
   declarations: [

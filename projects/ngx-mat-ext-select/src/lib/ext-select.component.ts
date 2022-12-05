@@ -145,7 +145,9 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy, ControlValue
   @Input() public selectDisplayIconInField = true;
 
   /**
-   * Determine if this component is disabled
+   * Determine if this component is disabled.  Does not apply when
+   * the component is part of a form, in which case the component need to
+   * be disabled and enabled via the FornControl or FormGroup
    */
   private disabled = false;
 

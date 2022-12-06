@@ -1,16 +1,11 @@
 {
   "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
   "allowedNonPeerDependencies": [
-    "@angular/flex-layout",
     "@fgrid-ngx/mde",
     "@fgrid-ngx/mat-searchbox"
   ],
   "dest": "../../dist/ngx-mat-ext-select",
   "lib": {
-    "entryFile": "src/public-api.ts",
-    "umdModuleIds": {
-      "@fgrid-ngx/mde": "@fgrid-ngx/mde",
-      "@fgrid-ngx/mat-searchbox": "@fgrid-ngx/mat-searchbox"
-    }
+    "entryFile": "src/public-api.ts"
   }
 }

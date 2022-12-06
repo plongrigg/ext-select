@@ -17,7 +17,8 @@
     "skipTemplateCodegen": true,
     "strictMetadataEmit": true,
     "enableResourceInlining": true,
-    "fullTemplateTypeCheck": true
+    "fullTemplateTypeCheck": true,
+    "compilationMode": "partial"
   },
   "exclude": [
     "src/test.ts",

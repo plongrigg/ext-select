@@ -1,4 +1,5 @@
-<form [formGroup]="selectForm" autocomplete="off" fxLayout="row" fxLayoutAlign="center center"
+<form [formGroup]="selectForm" autocomplete="off"
+  class="ngx-mat-ext-select-layout-row  ngx-mat-ext-select-layout-center"
   *ngIf="{icon: currentIcon | async} as component">
   <!--field to display selection, which also is trigger for drop down-list-->
   <mat-form-field #textfield
@@ -12,20 +13,22 @@
     <input #input matInput type="text" formControlName="selectField" [placeholder]="'selectPlaceholder'" readonly>
 
     <!--drop down arrow simulating a select component-->
-    <mat-icon matSuffix svgIcon="ngx-mat-ext-select-ddarrow"></mat-icon>
+    <mat-icon matSuffix matIconSuffix svgIcon="ngx-mat-ext-select-ddarrow"></mat-icon>
 
     <!--if icon to be displayed in field-->
-    <span matPrefix *ngIf="selectDisplayIconInField && component.icon?.id">
-      <mat-icon *ngIf="component.icon?.type === 'svg'" [svgIcon]="component.icon?.id || ''"
-        class="ngx-mat-ext-select-icon" [style.max-width.px]="35">
+    <span class="ngx-mat-ext-select-layout-row" matPrefix matIconPrefix
+      *ngIf="selectDisplayIconInField && component.icon?.id">
+      <mat-icon class="ngx-mat-ext-select-icon " *ngIf="component.icon?.type === 'svg'"
+        [svgIcon]="component.icon?.id || ''" [style.max-width.px]="35">
       </mat-icon>
-      <mat-icon *ngIf="component.icon?.type === 'basic'" [style.max-width.px]="35">{{component.icon?.id || ''}}
+      <mat-icon class="ngx-mat-ext-select-icon" *ngIf="component.icon?.type === 'basic'" [style.max-width.px]="35">
+        {{component.icon?.id || ''}}
       </mat-icon>
-      <mat-icon *ngIf="component.icon?.type === 'emoji'" [style.max-width.px]="35" class="ngx-mat-ext-select-emoji">
+      <mat-icon class="ngx-mat-ext-select-emoji" *ngIf="component.icon?.type === 'emoji'" [style.max-width.px]="35">
         {{component.icon?.id || ''}}
       </mat-icon>
       <span *ngIf="component.icon?.fieldDisplayIconGapPx"
-        [fxFlex]="(component.icon?.fieldDisplayIconGapPx || 0)+'px'"></span>
+        [style.width.px]="component.icon?.fieldDisplayIconGapPx || 0"></span>
     </span>
   </mat-form-field>
 
@@ -33,8 +36,9 @@
   <mde-popover #selectPopover="mdePopover" [mdePopoverOverlapTrigger]="true" mdePopoverPositionY="below"
     [mdeFocusTrapAutoCaptureEnabled]="false" mdePopoverPositionX="before" [mdePopoverOffsetY]="selectDDOffsetY"
     [mdePopoverOffsetX]="selectDDOffsetX">
-    <div *ngIf="(popupStatus | async) !== 'start'" class="ngx-mat-ext-select-panel" fxLayout="column" fxLayoutGap="5px"
-      fxLayoutAlign="start center" [style.padding-top.px]="selectSearch ? 5 : 0">
+    <div *ngIf="(popupStatus | async) !== 'start'"
+      class="ngx-mat-ext-select-panel ngx-mat-ext-select-layout-column ngx-mat-ext-select-layout-rowgap5px"
+      [style.padding-top.px]="selectSearch ? 8 : 0">
 
       <!--search box-->
       <ngx-mat-searchbox #search *ngIf="selectSearch" [searchData]="(searchData$ | async) || []"
@@ -59,22 +63,9 @@
             <mat-list-option [value]=item.value (click)="clickOption()"
               [ngClass]="(searchValueFound(item.value || '') | async)  ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
               [style.height.px]="selectItemHeight">
-
-              <!--icon if specified-->
-              <mat-icon class="ngx-mat-ext-select-icon" matListIcon *ngIf="item.icon && item.icon.type === 'svg'"
-                aria-hidden="true" [svgIcon]="item.icon.id"></mat-icon>
-              <mat-icon matListIcon *ngIf="item.icon && item.icon.type === 'basic'" aria-hidden="true">{{item.icon.id}}
-              </mat-icon>
-              <mat-icon class="ngx-mat-ext-select-emoji" matListIcon *ngIf="item.icon && item.icon.type === 'emoji'"
-                aria-hidden="true">{{item.icon.id}}
-              </mat-icon>
-
-              <!--item representation multi-line labels-->
-              <div matLine *ngFor="let label of item.labels; let lrow = index"
-                [ngStyle]="getLineStyle(lrow, label.style, label.fontSizePt)">{{label.text}}</div>
-
-              <mat-divider *ngIf="item.labels.length > 1"></mat-divider>
+              <ng-container *ngTemplateOutlet="optionContent; context:{item}"></ng-container>
             </mat-list-option>
+            <mat-divider *ngIf="item.labels.length > 1"></mat-divider>
           </ng-container>
         </cdk-virtual-scroll-viewport>
       </mat-selection-list>
@@ -89,24 +80,35 @@
           <mat-list-option [value]="item.value" (click)="clickOption()"
             [ngClass]="(searchValueFound(item.value || '') | async)  ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
             [style.height.px]="selectItemHeight">
-
-            <!--icon if specified-->
-            <mat-icon class="ngx-mat-ext-select-icon" matListIcon *ngIf="item.icon && item.icon.type === 'svg'"
-              aria-hidden="true" [svgIcon]="item.icon.id"></mat-icon>
-            <mat-icon matListIcon *ngIf="item.icon && item.icon.type === 'basic'" aria-hidden="true">{{item.icon.id}}
-            </mat-icon>
-            <mat-icon class="ngx-mat-ext-select-emoji" matListIcon *ngIf="item.icon && item.icon.type === 'emoji'"
-              aria-hidden="true">{{item.icon.id}}
-            </mat-icon>
-
-            <!--item representation multi-line labels-->
-            <div matLine *ngFor="let label of item.labels; let lrow = index"
-              [ngStyle]="getLineStyle(lrow, label.style, label.fontSizePt)">{{label.text}}</div>
-
-            <mat-divider *ngIf="item.labels.length > 1"></mat-divider>
+            <ng-container *ngTemplateOutlet="optionContent; context:{item}"></ng-container>
           </mat-list-option>
+          <mat-divider *ngIf="item.labels.length > 1"></mat-divider>
         </ng-container>
       </mat-selection-list>
     </div>
   </mde-popover>
 </form>
+
+<!--represents content of an option row-->
+<ng-template #optionContent let-item="item">
+  <div [class]="{'ngx-mat-ext-select-layout-row': true, 'ngx-mat-ext-select-layout-colgap15px': item.icon}">
+    <!--icon-->
+    <div class="ngx-mat-ext-select-layout-center">
+      <mat-icon class="ngx-mat-ext-select-icon" *ngIf="item.icon && item.icon.type === 'svg'" aria-hidden="true"
+        [svgIcon]="item.icon.id">
+      </mat-icon>
+      <mat-icon class="ngx-mat-ext-select-icon" *ngIf="item.icon && item.icon.type === 'basic'" aria-hidden="true">
+        {{item.icon.id}}
+      </mat-icon>
+      <mat-icon class="ngx-mat-ext-select-emoji" *ngIf="item.icon && item.icon.type === 'emoji'" aria-hidden="true">
+        {{item.icon.id}}
+      </mat-icon>
+    </div>
+
+    <!--item representation multi-line labels-->
+    <div class="ngx-mat-ext-select-layout-column">
+      <div *ngFor="let label of item.labels; let lrow = index"
+        [ngStyle]="getLineStyle(lrow, label.style, label.fontSizePt)">{{label.text}}</div>
+    </div>
+  </div>
+</ng-template>

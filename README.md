@@ -1,4 +1,4 @@
-<!-- PROJECT LOGO -->
+﻿<!-- PROJECT LOGO -->
 <br />
 <p align="center">
   <a href="https://github.com/plongrigg/ext-select">
@@ -53,7 +53,7 @@
 This is an extended Select component, offering the following features not available in the standard Angular Material mat-select component.  Note that this component currently only offers a single-select model.
 
 - Optional searchbox, with the drop down list being searched in either a filter or a find mode.
-- Multi-line select items
+- Multi-line select items, with icons and individual line formatting.
 - Virtual scrolling to more efficiently manage large drop-down lists. 
 
 A number of options are available to customize how the component appears and behaves (see API description below). 
@@ -63,7 +63,7 @@ A number of options are available to customize how the component appears and beh
 ## Getting Started
 ### Prerequisites
 
-This library requires that the host project is running Angular 10+.
+This library requires that the host project is running Angular 13+.
 
 As well as the standard Angular packages that are automatically installed, please ensure that your project also has the following optional Angular packages correctly installed.
  - @angular/forms
@@ -71,8 +71,7 @@ As well as the standard Angular packages that are automatically installed, pleas
  - @angular/cdk
 
 In addition the following package(s) will be automatically installed if not already available.
- - @angular/flex-layout
- - @fgrid-ngx/mde 
+  - @fgrid-ngx/mde 
  - @fgrid-ngx/mat-searchbox
 
 ### Installation
@@ -131,9 +130,9 @@ In addition the following package(s) will be automatically installed if not alre
 |selectDDWidth|350|The width of the drop-down panel.  If not defined it equals the width of the selection field.|
 |selectNoItemsVisible|5|The number of items that will be visible in the scrolling drop-down panel (if item count exceeds this value)|
 |selectDisplayIconInField|true|If there are icons associated with the select items, this determines whether the icon is also displayed in the select field. |
-|selectDisabled|false|Determines whether the component is disabled.  If there are no select items specified, it will be automatically disabled.|
+|selectDisabled|false|Determines whether the component is disabled.  If there are no select items specified, it will be automatically disabled. Note that this is not effective if the component is part of a FormGroup, in which case the disable() and enable() methods on the FormControl representing the component should be utilized for this purpose.|
 |selectedItem|undefined|Determines the currently selected item. This is useful for either setting the initial selected item, or for dynamically setting the selected item from outside the component. If this is not set, the initially selected item is determined by looking for an item in the supplied data with the selected field set to true, or alternatively it initially selects the first item in the select data.   |
-|selectFieldAppearance|outline|These correspond the the Angular Material appearances, 'outline', 'standard', 'fill' or 'legacy' |
+|selectFieldAppearance|outline|These correspond to the Angular Material appearances, 'outline', 'standard', 'fill' or 'legacy'. When used with Angular Material 15+, only 'fill' and 'outline' appearances are available. |
 |selectFieldSize|small|Options are 'small' or 'default'. If 'small' then the field has a font of 9pt and the margins, padding etc. are reduced so that the field can comfortably fit on a toolbar. If default, will use the standard sizing mechanism for Material components, where the font size is basically inherited from the parent component, and the margins, padding etc. are calculated accordingly.   |
 |selectDDOffsetY|selectFieldSize = 'small' 15 else 20|Determines the vertical offset of the drop-down panel relative to the top of the select field|
 |selectDDOffsetX|0|Determines the horizontal offset of the drop-down panel relative to the left of the select field|
@@ -154,7 +153,7 @@ In addition the following package(s) will be automatically installed if not alre
 ###
 |@Output|Description  |
 |--|--|
-|itemSelected| Emits details of select item as a SelectedItem type   |
+|itemSelected| Emits details of select item as a SelectedItem type.   |
 
 ## Known issues
 The initial drop-down action in Firefox shows a slight delay compared to other browsers.
@@ -162,7 +161,7 @@ The initial drop-down action in Firefox shows a slight delay compared to other b
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the MIT License. See [LICENSE](./LICENSE) for more information.
 
 <!-- CONTACT -->
 ## Contact

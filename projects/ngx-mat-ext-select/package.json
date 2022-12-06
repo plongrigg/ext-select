@@ -1,7 +1,7 @@
 {
   "name": "@fgrid-ngx/mat-ext-select",
   "description": "Extended select component for Angular Material",
-  "version": "1.0.14",
+  "version": "2.0.0",
   "author": {
     "name": "Peter C. Longrigg",
     "email": "plongrigg@gmail.com"

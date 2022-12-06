@@ -21,7 +21,18 @@
     "mat select",
     "mat select filter",
     "mat select search",
-    "mat select searchable"
+    "mat select searchable",
+    "searchable select angular",
+    "angular",
+    "angular searchbox",
+    "angular material searchbox",
+    "searchbox",
+    "searchbox component",
+    "toolbar searchbox",
+    "search component",
+    "search",
+    "mat search",
+    "mat searchbox"
   ],
   "peerDependencies": {
     "@angular/animations": ">=13.0.0",

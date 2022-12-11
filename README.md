@@ -137,6 +137,7 @@ In addition the following package(s) will be automatically installed if not alre
 |selectDDOffsetY|selectFieldSize = 'small' 15 else 20|Determines the vertical offset of the drop-down panel relative to the top of the select field|
 |selectDDOffsetX|0|Determines the horizontal offset of the drop-down panel relative to the left of the select field|
 |selectVirtualScroll|true|Determines if virtual scrolling should be used for list.  Virtual scrolling is more efficient in terms of DOM usage for large lists, but scrolling might not be as smooth for smaller lists - repainting is slower. |
+|selectPropogateBackdropClick|false|When the dropdown list closes in response to a click outside the component, determines whether to propogate the click to an underlying component. If set to true, a single click both closes the dropdown and operates on the component on which the click occurs. If set to false, a second click is needed on the underlying component.
 |selectSearch|true|Determines whether the searchbox is included on the drop-down panel.|
 |searchExtended | true | Determines if options for extended search are available i.e. startsWith, caseSensitive and range. |
 |searchExtendedPopupDelay | 1000 | Panel to enter extended search parameters opens on hovering over extended (+) button. This determines how long the delay is in milliseconds prior to the panel appearing. 

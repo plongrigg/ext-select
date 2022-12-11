@@ -1,7 +1,7 @@
 {
   "name": "@fgrid-ngx/mat-ext-select",
   "description": "Extended select component for Angular Material",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": {
     "name": "Peter C. Longrigg",
     "email": "plongrigg@gmail.com"
@@ -57,7 +57,8 @@
     "@angular/platform-browser": "~13.3.12",
     "@angular/platform-browser-dynamic": "~13.3.12",
     "@angular/router": "~13.3.12",
-    "@fgrid-ngx/mat-ext-select": "file:dist/ngx-mat-ext-select",
+    "@fgrid-ngx/mat-searchbox": "^1.0.13",
+    "@fgrid-ngx/mde": "^3.0.7",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.11.4"

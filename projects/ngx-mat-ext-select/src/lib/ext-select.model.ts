@@ -36,8 +36,8 @@ export type SelectItem = {
   index?: number;            // no need to populate this field for input
   icon?: SelectItemIcon;
   labels: SelectItemLabel[];
-  display: string;         // single-line representation of item for field display
-  selected?: boolean;      // initially selected item
+  display: string;          // single-line representation of item for field display
+  selected?: boolean;       // initially selected item
 };
 
 /**

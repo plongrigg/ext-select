@@ -214,6 +214,14 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy, ControlValue
   @Input() public selectVirtualScroll = true;
 
   /**
+   * When the dropdown list closes in response to a click outside the component,
+   * determines whether to propogate the click to an underlying component.  If set to true, a single click
+   * both closes the dropdown and operates on the component on which the click occurs.  If
+   * set to false, a second click is needed on the underlying component.
+   */
+  @Input() public selectPropogateBackdropClick = false;
+
+  /**
    * Determines if there is a search component appearing on top of the list
    */
   @Input() public selectSearch = true;
@@ -745,7 +753,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy, ControlValue
   private onTouched = () => { };
 
   public writeValue(value: string | number | undefined): void {
-     this.setSelectedValue(value);
+    this.setSelectedValue(value);
   }
 
   public registerOnChange(fn: (value: number | string | undefined) => void): void {
@@ -760,7 +768,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy, ControlValue
   }
 
   public setDisabledState(disabled: boolean): void {
-     this.selectDisabled = disabled;
+    this.selectDisabled = disabled;
   }
 
   private markAsTouched(): void {

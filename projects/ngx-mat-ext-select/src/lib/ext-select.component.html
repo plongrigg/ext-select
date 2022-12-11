@@ -5,8 +5,8 @@
   <mat-form-field #textfield
     [ngClass]="{'ngx-mat-ext-select-field':true, 'ngx-mat-ext-select-small-input': selectFieldSize==='small'}"
     [appearance]="selectFieldAppearance" [style.width.px]="selectFieldWidth" [mdePopoverTriggerFor]="selectPopover"
-    mdePopoverTriggerOn="click" popoverTrigger="mdePopoverTrigger" [mdePopoverCloseOnClick]="false" (opened)="opened()"
-    (closed)="closed()">
+    mdePopoverTriggerOn="click" popoverTrigger="mdePopoverTrigger" [mdePopoverCloseOnClick]="false"
+    [mdePropogateBackdropClick]="selectPropogateBackdropClick" (opened)="opened()" (closed)="closed()">
 
     <!--floating and placeholder label-->
     <mat-label>{{selectPlaceholder}}</mat-label>

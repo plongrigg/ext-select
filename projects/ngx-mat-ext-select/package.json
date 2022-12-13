@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "tslib": "^2.0.0",
-    "@fgrid-ngx/mde": ">= 3.0.8",
+    "@fgrid-ngx/mde": ">= 3.0.9",
     "@fgrid-ngx/mat-searchbox": ">=1.0.13"
   }
 }

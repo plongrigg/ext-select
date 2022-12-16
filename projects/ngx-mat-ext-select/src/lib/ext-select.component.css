@@ -243,6 +243,22 @@
   row-gap: 5px;
 }
 
+.ngx-mat-ext-select-layout-rowgap3px {
+  row-gap: 3px;
+}
+
+
 .ngx-mat-ext-select-layout-colgap15px {
   column-gap: 15px;
+}
+
+.ngx-mat-ext-select-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+  font-weight: normal;
+  line-height: initial;
 }

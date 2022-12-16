@@ -106,9 +106,9 @@
     </div>
 
     <!--item representation multi-line labels-->
-    <div class="ngx-mat-ext-select-layout-column">
+    <div class="ngx-mat-ext-select-layout-column ngx-mat-ext-select-layout-rowgap3px">
       <div *ngFor="let label of item.labels; let lrow = index"
-        [ngStyle]="getLineStyle(lrow, label.style, label.fontSizePt)">{{label.text}}</div>
+        class = "ngx-mat-ext-select-line" [ngStyle]="getLineStyle(lrow, label.style, label.fontSizePt)">{{label.text}}</div>
     </div>
   </div>
 </ng-template>

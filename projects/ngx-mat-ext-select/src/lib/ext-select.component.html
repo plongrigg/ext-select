@@ -51,7 +51,8 @@
 
       <!--virtual scrolled list-->
       <mat-selection-list *ngIf="selectVirtualScroll" class="ngx-mat-ext-select-list" formControlName="selectList"
-        [multiple]="false" [style.visibility]="(popupStatus | async) === 'open' ? 'visible' : 'hidden'">
+        [multiple]="false" [style.visibility]="(popupStatus | async) === 'open' ? 'visible' : 'hidden'"
+        hideSingleSelectionIndicator="true">
 
         <!--scroller for list - needed for scrollTo on search functionality + dealing with large lists-->
         <cdk-virtual-scroll-viewport ngxScroller #viewport [itemSize]="selectItemHeight"
@@ -73,7 +74,8 @@
       <!--standard scrolled list-->
       <mat-selection-list *ngIf="!selectVirtualScroll" ngxScroller class="ngx-mat-ext-select-list-scroll"
         [multiple]=false formControlName="selectList" [style.height.px]="viewportHeight"
-        [style.width.px]="selectDDWidth" [style.visibility]="(popupStatus | async) === 'open' ? 'visible' : 'hidden'">
+        [style.width.px]="selectDDWidth" [style.visibility]="(popupStatus | async) === 'open' ? 'visible' : 'hidden'"
+        hideSingleSelectionIndicator="true">
 
         <!--each row represents a item-->
         <ng-container *ngFor="let item of selectItems$ | async; trackBy:listTrackBy;">
@@ -107,8 +109,8 @@
 
     <!--item representation multi-line labels-->
     <div class="ngx-mat-ext-select-layout-column ngx-mat-ext-select-layout-rowgap3px">
-      <div *ngFor="let label of item.labels; let lrow = index"
-        class = "ngx-mat-ext-select-line" [ngStyle]="getLineStyle(lrow, label.style, label.fontSizePt)">{{label.text}}</div>
+      <div *ngFor="let label of item.labels; let lrow = index" class="ngx-mat-ext-select-line"
+        [ngStyle]="getLineStyle(lrow, label.style, label.fontSizePt)">{{label.text}}</div>
     </div>
   </div>
 </ng-template>

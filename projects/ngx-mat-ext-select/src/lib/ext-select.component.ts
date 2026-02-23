@@ -3,7 +3,7 @@ import {
   ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input,
   OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation
 } from '@angular/core';
-import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, UntypedFormControl, UntypedFormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NgxMatSearchboxComponent, SearchData, SearchResults, SearchTerms } from '@fgrid-ngx/mat-searchbox';
@@ -21,20 +21,21 @@ import { enableControls } from './ext-select.utils';
  * component as possible (single selection only)
  */
 @Component({
-  // tslint:disable-next-line:component-selector
-  selector: 'ngx-mat-ext-select',
-  exportAs: 'ngxMatExtSelect',
-  templateUrl: './ext-select.component.html',
-  styleUrls: ['./ext-select.component.css'],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      multi: true,
-      useExisting: forwardRef(() => NgxMatExtSelectComponent),
-    }
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None
+    // tslint:disable-next-line:component-selector
+    selector: 'ngx-mat-ext-select',
+    exportAs: 'ngxMatExtSelect',
+    templateUrl: './ext-select.component.html',
+    styleUrls: ['./ext-select.component.css'],
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            multi: true,
+            useExisting: forwardRef(() => NgxMatExtSelectComponent),
+        }
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class NgxMatExtSelectComponent implements OnInit, OnDestroy, ControlValueAccessor {
 
@@ -177,7 +178,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy, ControlValue
   /**
    * Applies angular material apperance to the field
    */
-  @Input() public selectFieldAppearance: 'outline' | 'standard' | 'fill' | 'legacy' = 'outline';
+  @Input() public selectFieldAppearance: 'outline' | 'fill'  = 'outline';
 
   /**
    * If 'small' then the field has a font of 9pt and the margins, padding etc. are reduced so that
@@ -322,7 +323,7 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy, ControlValue
   /**
    * Form used to bind controls (field and list) to a model
    */
-  public selectForm = new FormGroup({});
+  public selectForm = new UntypedFormGroup({});
 
   /**
    * Tracks results of search
@@ -404,8 +405,8 @@ export class NgxMatExtSelectComponent implements OnInit, OnDestroy, ControlValue
 
     // define form controls with initial values
     this.trackCurrentIcon(initSelectedItem?.value);
-    const selectField = new FormControl(initSelectedItem?.display.trimRight() || null);
-    const selectList = new FormControl(initSelectedItem?.value ? [initSelectedItem.value] : []);
+    const selectField = new UntypedFormControl(initSelectedItem?.display.trimRight() || null);
+    const selectList = new UntypedFormControl(initSelectedItem?.value ? [initSelectedItem.value] : []);
     this.selectForm.addControl('selectField', selectField);
     this.selectForm.addControl('selectList', selectList);
 

@@ -1,116 +1,165 @@
-<form [formGroup]="selectForm" autocomplete="off"
-  class="ngx-mat-ext-select-layout-row  ngx-mat-ext-select-layout-center"
-  *ngIf="{icon: currentIcon | async} as component">
+@let icon = currentIcon | async;
+@let popoup = popupStatus | async;
+<form [formGroup]="selectForm" autocomplete="off" class="ngx-mat-ext-select-layout-row ngx-mat-ext-select-layout-center">
   <!--field to display selection, which also is trigger for drop down-list-->
-  <mat-form-field #textfield
-    [ngClass]="{'ngx-mat-ext-select-field':true, 'ngx-mat-ext-select-small-input': selectFieldSize==='small'}"
-    [appearance]="selectFieldAppearance" [style.width.px]="selectFieldWidth" [mdePopoverTriggerFor]="selectPopover"
-    mdePopoverTriggerOn="click" [mdePopoverCloseOnClick]="false"
-    [mdePropogateBackdropClick]="selectPropogateBackdropClick" (opened)="opened()" (closed)="closed()">
-
+  <mat-form-field
+    #textfield
+    [ngClass]="{ 'ngx-mat-ext-select-field': true, 'ngx-mat-ext-select-small-input': selectFieldSize === 'small', 'ngx-mat-ext-select-popup-open': popoup === 'open' }"
+    [appearance]="selectFieldAppearance"
+    [style.width.px]="selectFieldWidth"
+    [mdePopoverTriggerFor]="selectPopover"
+    mdePopoverTriggerOn="click"
+    [mdePopoverCloseOnClick]="false"
+    [mdePropogateBackdropClick]="selectPropogateBackdropClick"
+    (opened)="opened()"
+    (closed)="closed()">
     <!--floating and placeholder label-->
-    <mat-label>{{selectPlaceholder}}</mat-label>
-    <input #input matInput type="text" formControlName="selectField" [placeholder]="'selectPlaceholder'" readonly>
-
+    <mat-label>{{ selectPlaceholder }}</mat-label>
+    <input #input matInput type="text" formControlName="selectField" [placeholder]="'selectPlaceholder'" readonly />
     <!--drop down arrow simulating a select component-->
     <mat-icon matSuffix matIconSuffix svgIcon="ngx-mat-ext-select-ddarrow"></mat-icon>
-
     <!--if icon to be displayed in field-->
-    <span class="ngx-mat-ext-select-layout-row" matPrefix matIconPrefix
-      *ngIf="selectDisplayIconInField && component.icon?.id">
-      <mat-icon class="ngx-mat-ext-select-icon " *ngIf="component.icon?.type === 'svg'"
-        [svgIcon]="component.icon?.id || ''" [style.max-width.px]="35">
-      </mat-icon>
-      <mat-icon class="ngx-mat-ext-select-icon" *ngIf="component.icon?.type === 'basic'" [style.max-width.px]="35">
-        {{component.icon?.id || ''}}
-      </mat-icon>
-      <mat-icon class="ngx-mat-ext-select-emoji" *ngIf="component.icon?.type === 'emoji'" [style.max-width.px]="35">
-        {{component.icon?.id || ''}}
-      </mat-icon>
-      <span *ngIf="component.icon?.fieldDisplayIconGapPx"
-        [style.width.px]="component.icon?.fieldDisplayIconGapPx || 0"></span>
-    </span>
+    @if (selectDisplayIconInField && icon?.id) {
+      <span class="ngx-mat-ext-select-layout-row" matPrefix matIconPrefix>
+        @if (icon?.type === "svg") {
+          <mat-icon class="ngx-mat-ext-select-icon" [svgIcon]="icon?.id || ''" [style.max-width.px]="35"> </mat-icon>
+        }
+        @if (icon?.type === "basic") {
+          <mat-icon class="ngx-mat-ext-select-icon" [style.max-width.px]="35">
+            {{ icon?.id || "" }}
+          </mat-icon>
+        }
+        @if (icon?.type === "emoji") {
+          <mat-icon class="ngx-mat-ext-select-emoji" [style.max-width.px]="35">
+            {{ icon?.id || "" }}
+          </mat-icon>
+        }
+        @if (icon?.fieldDisplayIconGapPx) {
+          <span [style.width.px]="icon?.fieldDisplayIconGapPx || 0"></span>
+        }
+      </span>
+    }
   </mat-form-field>
-
   <!--popover for drop down list-->
-  <mde-popover #selectPopover="mdePopover" [mdePopoverOverlapTrigger]="true" mdePopoverPositionY="below"
-    [mdeFocusTrapAutoCaptureEnabled]="false" mdePopoverPositionX="before" [mdePopoverOffsetY]="selectDDOffsetY"
+  <mde-popover
+    #selectPopover="mdePopover"
+    [mdePopoverOverlapTrigger]="true"
+    mdePopoverPositionY="below"
+    [mdeFocusTrapAutoCaptureEnabled]="false"
+    mdePopoverPositionX="before"
+    [mdePopoverOffsetY]="selectDDOffsetY"
     [mdePopoverOffsetX]="selectDDOffsetX">
-    <div *ngIf="(popupStatus | async) !== 'start'"
-      class="ngx-mat-ext-select-panel ngx-mat-ext-select-layout-column ngx-mat-ext-select-layout-rowgap5px"
-      [style.padding-top.px]="selectSearch ? 8 : 0">
-
-      <!--search box-->
-      <ngx-mat-searchbox #search *ngIf="selectSearch" [searchData]="(searchData$ | async) || []"
-        [searchExcludeChars]="searchExcludeChars" [searchComponentWidth]="selectDDWidth - 40"
-        [searchExtended]="searchExtended" [searchExtendedPopupDelay]="searchExtendedPopupDelay"
-        [searchTerms]="searchTerms" [searchNextRow]="searchNextRow" [searchContinuous]="searchContinuous"
-        [searchDebounceMS]="searchDebounceMS" [searchCaseSensitive]="searchCaseSensitive"
-        [searchStartsWith]="searchStartsWith" [searchMultiple]="searchMultiple" (searchResults)="searched($event)">
-      </ngx-mat-searchbox>
-
-      <!--virtual scrolled list-->
-      <mat-selection-list *ngIf="selectVirtualScroll" class="ngx-mat-ext-select-list" formControlName="selectList"
-        [multiple]="false" [style.visibility]="(popupStatus | async) === 'open' ? 'visible' : 'hidden'"
-        hideSingleSelectionIndicator="true">
-
-        <!--scroller for list - needed for scrollTo on search functionality + dealing with large lists-->
-        <cdk-virtual-scroll-viewport ngxScroller #viewport [itemSize]="selectItemHeight"
-          [minBufferPx]="selectItemHeight*4" [maxBufferPx]="selectItemHeight*8" class="ngx-mat-ext-select-nohorzscroll"
-          [style.width.px]="selectDDWidth" [style.height.px]="viewportHeight">
-
-          <!--each row represents a item-->
-          <ng-container *cdkVirtualFor="let item of selectItems$ | async; trackBy:listTrackBy;  templateCacheSize: 0;">
-            <mat-list-option [value]=item.value (click)="clickOption()"
-              [ngClass]="(searchValueFound(item.value || '') | async)  ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
-              [style.height.px]="selectItemHeight">
-              <ng-container *ngTemplateOutlet="optionContent; context:{item}"></ng-container>
-            </mat-list-option>
-            <mat-divider *ngIf="item.labels.length > 1"></mat-divider>
-          </ng-container>
-        </cdk-virtual-scroll-viewport>
-      </mat-selection-list>
-
-      <!--standard scrolled list-->
-      <mat-selection-list *ngIf="!selectVirtualScroll" ngxScroller class="ngx-mat-ext-select-list-scroll"
-        [multiple]=false formControlName="selectList" [style.height.px]="viewportHeight"
-        [style.width.px]="selectDDWidth" [style.visibility]="(popupStatus | async) === 'open' ? 'visible' : 'hidden'"
-        hideSingleSelectionIndicator="true">
-
-        <!--each row represents a item-->
-        <ng-container *ngFor="let item of selectItems$ | async; trackBy:listTrackBy;">
-          <mat-list-option [value]="item.value" (click)="clickOption()"
-            [ngClass]="(searchValueFound(item.value || '') | async)  ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
-            [style.height.px]="selectItemHeight">
-            <ng-container *ngTemplateOutlet="optionContent; context:{item}"></ng-container>
-          </mat-list-option>
-          <mat-divider *ngIf="item.labels.length > 1"></mat-divider>
-        </ng-container>
-      </mat-selection-list>
-    </div>
+    @if ((popupStatus | async) !== "start") {
+      <div class="ngx-mat-ext-select-panel ngx-mat-ext-select-layout-column ngx-mat-ext-select-layout-rowgap5px" [style.padding-top.px]="selectSearch ? 8 : 0">
+        <!--search box-->
+        @if (selectSearch) {
+          <ngx-mat-searchbox
+            #search
+            [searchData]="(searchData$ | async) || []"
+            [searchExcludeChars]="searchExcludeChars"
+            [searchComponentWidth]="selectDDWidth - 40"
+            [searchExtended]="searchExtended"
+            [searchExtendedPopupDelay]="searchExtendedPopupDelay"
+            [searchTerms]="searchTerms"
+            [searchNextRow]="searchNextRow"
+            [searchContinuous]="searchContinuous"
+            [searchDebounceMS]="searchDebounceMS"
+            [searchCaseSensitive]="searchCaseSensitive"
+            [searchStartsWith]="searchStartsWith"
+            [searchMultiple]="searchMultiple"
+            (searchResults)="searched($event)">
+          </ngx-mat-searchbox>
+        }
+        <!--virtual scrolled list-->
+        @if (selectVirtualScroll) {
+          <mat-selection-list
+            class="ngx-mat-ext-select-list"
+            formControlName="selectList"
+            [multiple]="false"
+            [style.visibility]="(popupStatus | async) === 'open' ? 'visible' : 'hidden'"
+            hideSingleSelectionIndicator="true">
+            <!--scroller for list - needed for scrollTo on search functionality + dealing with large lists-->
+            <cdk-virtual-scroll-viewport
+              ngxScroller
+              #viewport
+              [itemSize]="selectItemHeight"
+              [minBufferPx]="selectItemHeight * 4"
+              [maxBufferPx]="selectItemHeight * 8"
+              class="ngx-mat-ext-select-nohorzscroll"
+              [style.width.px]="selectDDWidth"
+              [style.height.px]="viewportHeight">
+              <!--each row represents a item-->
+              <ng-container *cdkVirtualFor="let item of selectItems$ | async; trackBy: listTrackBy; templateCacheSize: 0">
+                <mat-list-option
+                  [value]="item.value"
+                  (click)="clickOption()"
+                  [ngClass]="(searchValueFound(item.value || '') | async) ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
+                  [style.height.px]="selectItemHeight">
+                  <ng-container *ngTemplateOutlet="optionContent; context: { item }"></ng-container>
+                </mat-list-option>
+                @if (item.labels.length > 1) {
+                  <mat-divider></mat-divider>
+                }
+              </ng-container>
+            </cdk-virtual-scroll-viewport>
+          </mat-selection-list>
+        }
+        <!--standard scrolled list-->
+        @if (!selectVirtualScroll) {
+          <mat-selection-list
+            ngxScroller
+            class="ngx-mat-ext-select-list-scroll"
+            [multiple]="false"
+            formControlName="selectList"
+            [style.height.px]="viewportHeight"
+            [style.width.px]="selectDDWidth"
+            [style.visibility]="(popupStatus | async) === 'open' ? 'visible' : 'hidden'"
+            hideSingleSelectionIndicator="true">
+            <!--each row represents a item-->
+            @for (item of selectItems$ | async; track listTrackBy($index, item)) {
+              <mat-list-option
+                [value]="item.value"
+                (click)="clickOption()"
+                [ngClass]="(searchValueFound(item.value || '') | async) ? 'ngx-mat-ext-select-search-found' : 'ngx-mat-ext-select-search-notfound'"
+                [style.height.px]="selectItemHeight">
+                <ng-container *ngTemplateOutlet="optionContent; context: { item }"></ng-container>
+              </mat-list-option>
+              @if (item.labels.length > 1) {
+                <mat-divider></mat-divider>
+              }
+            }
+          </mat-selection-list>
+        }
+      </div>
+    }
   </mde-popover>
 </form>
 
 <!--represents content of an option row-->
 <ng-template #optionContent let-item="item">
-  <div [class]="{'ngx-mat-ext-select-layout-row': true, 'ngx-mat-ext-select-layout-colgap15px': item.icon}">
+  <div [class]="{ 'ngx-mat-ext-select-layout-row': true, 'ngx-mat-ext-select-layout-colgap15px': item.icon }">
     <!--icon-->
     <div class="ngx-mat-ext-select-layout-center">
-      <mat-icon class="ngx-mat-ext-select-icon" *ngIf="item.icon && item.icon.type === 'svg'" aria-hidden="true"
-        [svgIcon]="item.icon.id">
-      </mat-icon>
-      <mat-icon class="ngx-mat-ext-select-icon" *ngIf="item.icon && item.icon.type === 'basic'" aria-hidden="true">
-        {{item.icon.id}}
-      </mat-icon>
-      <mat-icon class="ngx-mat-ext-select-emoji" *ngIf="item.icon && item.icon.type === 'emoji'" aria-hidden="true">
-        {{item.icon.id}}
-      </mat-icon>
+      @if (item.icon && item.icon.type === "svg") {
+        <mat-icon class="ngx-mat-ext-select-icon" aria-hidden="true" [svgIcon]="item.icon.id"> </mat-icon>
+      }
+      @if (item.icon && item.icon.type === "basic") {
+        <mat-icon class="ngx-mat-ext-select-icon" aria-hidden="true">
+          {{ item.icon.id }}
+        </mat-icon>
+      }
+      @if (item.icon && item.icon.type === "emoji") {
+        <mat-icon class="ngx-mat-ext-select-emoji" aria-hidden="true">
+          {{ item.icon.id }}
+        </mat-icon>
+      }
     </div>
 
     <!--item representation multi-line labels-->
     <div class="ngx-mat-ext-select-layout-column ngx-mat-ext-select-layout-rowgap3px">
-      <div *ngFor="let label of item.labels; let lrow = index" class="ngx-mat-ext-select-line"
-        [ngStyle]="getLineStyle(lrow, label.style, label.fontSizePt)">{{label.text}}</div>
+      @for (label of item.labels; track label; let lrow = $index) {
+        <div class="ngx-mat-ext-select-line" [ngStyle]="getLineStyle(lrow, label.style, label.fontSizePt)">{{ label.text }}</div>
+      }
     </div>
   </div>
 </ng-template>

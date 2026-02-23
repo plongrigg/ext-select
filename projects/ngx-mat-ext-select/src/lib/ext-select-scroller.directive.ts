@@ -6,8 +6,9 @@ import { Directive, ElementRef, Optional } from '@angular/core';
  * that api to scroll, otherwise use the elementRef (should be a MatSelectionList)
  */
 @Directive({
-  // tslint:disable-next-line:directive-selector
-  selector: '[ngxScroller]'
+    // tslint:disable-next-line:directive-selector
+    selector: '[ngxScroller]',
+    standalone: false
 })
 export class ScrollerDirective {
   constructor(private selectionList: ElementRef, @Optional() private viewport: CdkVirtualScrollViewport) { }

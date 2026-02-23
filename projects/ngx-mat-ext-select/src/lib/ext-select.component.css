@@ -87,7 +87,7 @@
 }
 .ngx-mat-ext-select-small-input.mat-mdc-form-field .mat-mdc-form-field-infix {
   padding: 0px 0px 0px 0px;
-  font-size: 9pt;
+  font-size: 10pt;
   min-height: 24px;
 }
 .ngx-mat-ext-select-small-input.mat-mdc-form-field
@@ -128,40 +128,61 @@
   top: 10px;
 }
 
+.ngx-mat-ext-select-field:not(.mat-form-field-disabled),
+.ngx-mat-ext-select-field:not(.mat-form-field-disabled) .mat-mdc-input-element {
+  cursor: pointer;
+}
+
+/** rotate the dropdown arrow and change the color when the popup is open */
+.ngx-mat-ext-select-field.ngx-mat-ext-select-popup-open .mat-mdc-form-field-icon-suffix > .mat-icon > *
+{
+  transform: rotate(180deg);
+  fill: rgb(0, 92, 187)
+}
+
 /* Material 14 and below small form field */
-.ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-flex {
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.ngx-mat-ext-select-small-input.mat-mdc-form-field .mat-form-field-flex {
   align-items: center;
   padding-right: 0.1em;
 }
-.ngx-mat-ext-select-small-input.mat-form-field:not([appearance="outline"])
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.ngx-mat-ext-select-small-input.mat-mdc-form-field:not([appearance="outline"])
   .mat-form-field-flex {
   padding-top: 0em;
 }
-.ngx-mat-ext-select-small-input.mat-form-field:not([appearance="outline"])
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.ngx-mat-ext-select-small-input.mat-mdc-form-field:not([appearance="outline"])
   .mat-form-field-wrapper
   .mat-form-field-underline {
   bottom: 0em;
 }
-.ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-infix {
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.ngx-mat-ext-select-small-input.mat-mdc-form-field .mat-form-field-infix {
   padding: 0.6em 0 0.75em 0;
-  font-size: 9pt;
+  font-size: 10pt;
 }
-.ngx-mat-ext-select-small-input.mat-form-field
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.ngx-mat-ext-select-small-input.mat-mdc-form-field
   .mat-form-field-infix
   .mat-select-arrow {
   margin-top: 6px;
 }
-.ngx-mat-ext-select-small-input.mat-form-field:not(.mat-form-field-should-float)
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.ngx-mat-ext-select-small-input.mat-mdc-form-field:not(.mat-form-field-should-float)
   .mat-form-field-label.mat-form-field-empty {
   top: 1.5em;
 }
-.ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-wrapper {
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.ngx-mat-ext-select-small-input.mat-mdc-form-field .mat-form-field-wrapper {
   padding-bottom: 0em;
 }
-.ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-suffix {
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.ngx-mat-ext-select-small-input.mat-mdc-form-field .mat-form-field-suffix {
   top: 0.12em;
 }
-.ngx-mat-ext-select-small-input.mat-form-field .mat-form-field-prefix {
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.ngx-mat-ext-select-small-input.mat-mdc-form-field .mat-form-field-prefix {
   top: 0.12em;
 }
 

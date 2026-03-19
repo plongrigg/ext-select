@@ -11,11 +11,9 @@
     Extended Select component, with searchbox and multi-line items,  based on Angular Material
     <br />
     <br />
+    <a  href="https://stackblitz.com/edit/ext-select-demo2">Stackblitz demo</a>
+    ·
     <a href="https://github.com/plongrigg/ext-select-demo">Demo code</a>
-    ·
-    <a  href="https://ext-select-demo.stackblitz.io/">Demo</a>
-    ·
-    <a  href="https://stackblitz.com/edit/ext-select-demo">Stackblitz demo (with code)</a>
     ·
     <a href="https://github.com/plongrigg/ext-select/issues">Report Bug / Request Feature</a>
      </p>
